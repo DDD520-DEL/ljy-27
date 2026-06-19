@@ -30,6 +30,34 @@ export const MapPage: React.FC = () => {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
+  const errorTimerRef = React.useRef<number | null>(null);
+
+  const clearLocateError = React.useCallback(() => {
+    setLocateError(null);
+    if (errorTimerRef.current) {
+      clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = null;
+    }
+  }, []);
+
+  const setLocateErrorWithAutoClear = React.useCallback((message: string) => {
+    setLocateError(message);
+    if (errorTimerRef.current) {
+      clearTimeout(errorTimerRef.current);
+    }
+    errorTimerRef.current = window.setTimeout(() => {
+      setLocateError(null);
+      errorTimerRef.current = null;
+    }, 5000);
+  }, []);
+
+  React.useEffect(() => {
+    return () => {
+      if (errorTimerRef.current) {
+        clearTimeout(errorTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (benches.length === 0) {
@@ -42,6 +70,8 @@ export const MapPage: React.FC = () => {
 
   const handleBenchClick = (id: string) => {
     setSelectedBench(id);
+    clearLocateError();
+    setUserLocation(null);
     if (window.innerWidth < 768) {
       setShowMobileDetail(true);
     }
@@ -55,24 +85,25 @@ export const MapPage: React.FC = () => {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
     updateFilters({ searchKeyword: e.target.value });
+    clearLocateError();
   };
 
   const handleLocate = () => {
     if (!navigator.geolocation) {
-      setLocateError('您的浏览器不支持地理定位');
+      setLocateErrorWithAutoClear('您的浏览器不支持地理定位');
       return;
     }
 
     setIsLocating(true);
-    setLocateError(null);
+    clearLocateError();
     setUserLocation(null);
+    setSelectedBench(null);
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation([latitude, longitude]);
         setIsLocating(false);
-        setLocateError(null);
       },
       (error) => {
         setIsLocating(false);
@@ -88,7 +119,7 @@ export const MapPage: React.FC = () => {
             errorMessage = '定位超时，请重试';
             break;
         }
-        setLocateError(errorMessage);
+        setLocateErrorWithAutoClear(errorMessage);
       },
       {
         enableHighAccuracy: true,
@@ -130,7 +161,10 @@ export const MapPage: React.FC = () => {
             </div>
 
             <button
-              onClick={toggleFilter}
+              onClick={() => {
+                toggleFilter();
+                clearLocateError();
+              }}
               className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${
                 isFilterOpen
                   ? 'bg-emerald-100 text-emerald-700'
@@ -141,7 +175,10 @@ export const MapPage: React.FC = () => {
             </button>
 
             <button
-              onClick={() => navigate('/add')}
+              onClick={() => {
+                navigate('/add');
+                clearLocateError();
+              }}
               className="h-11 px-5 rounded-xl bg-emerald-600 text-white font-medium flex items-center gap-2 hover:bg-emerald-700 transition-colors shadow-md hover:shadow-lg"
             >
               <Plus size={20} />

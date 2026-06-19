@@ -53,10 +53,10 @@ export const MapView: React.FC<MapViewProps> = ({
 }) => {
   const selectedBench = benches.find((b) => b.id === selectedBenchId);
   let mapCenter: [number, number] = center;
-  if (userLocation) {
-    mapCenter = userLocation;
-  } else if (selectedBench) {
+  if (selectedBench) {
     mapCenter = [selectedBench.lat, selectedBench.lng];
+  } else if (userLocation) {
+    mapCenter = userLocation;
   }
 
   return (
@@ -72,7 +72,7 @@ export const MapView: React.FC<MapViewProps> = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MapController center={mapCenter} zoom={userLocation ? 16 : (selectedBench ? 15 : zoom)} />
+        <MapController center={mapCenter} zoom={selectedBench ? 15 : (userLocation ? 16 : zoom)} />
         {interactive && <MapClickHandler onClick={onMapClick} />}
         {userLocation && (
           <>
