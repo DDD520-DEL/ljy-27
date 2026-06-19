@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData } from '../types/bench';
-import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId } from '../utils/storage';
+import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 
 interface BenchState {
   benches: Bench[];
   comments: Comment[];
+  favorites: string[];
   selectedBenchId: string | null;
   filters: FilterOptions;
   isFilterOpen: boolean;
@@ -13,12 +14,15 @@ interface BenchState {
 
   initBenches: () => void;
   initComments: () => void;
+  initFavorites: () => void;
   setSelectedBench: (id: string | null) => void;
   addBench: (data: NewBenchData) => void;
   updateFilters: (filters: Partial<FilterOptions>) => void;
   resetFilters: () => void;
   toggleFilter: () => void;
   toggleDetail: () => void;
+  toggleFavorite: (benchId: string) => void;
+  isFavorite: (benchId: string) => boolean;
   getFilteredBenches: () => Bench[];
   getSelectedBench: () => Bench | undefined;
   addComment: (data: NewCommentData) => void;
@@ -36,11 +40,13 @@ const defaultFilters: FilterOptions = {
   minViewScore: 0,
   searchKeyword: '',
   benchTypes: [],
+  onlyFavorites: false,
 };
 
 export const useBenchStore = create<BenchState>((set, get) => ({
   benches: [],
   comments: [],
+  favorites: [],
   selectedBenchId: null,
   filters: defaultFilters,
   isFilterOpen: false,
@@ -54,6 +60,11 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   initComments: () => {
     const comments = loadComments();
     set({ comments });
+  },
+
+  initFavorites: () => {
+    const favorites = loadFavorites();
+    set({ favorites });
   },
 
   setSelectedBench: (id) => {
@@ -96,9 +107,23 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     set((state) => ({ isDetailOpen: !state.isDetailOpen }));
   },
 
+  toggleFavorite: (benchId) => {
+    const { favorites } = get();
+    const newFavorites = favorites.includes(benchId)
+      ? favorites.filter((id) => id !== benchId)
+      : [...favorites, benchId];
+    set({ favorites: newFavorites });
+    saveFavorites(newFavorites);
+  },
+
+  isFavorite: (benchId) => {
+    return get().favorites.includes(benchId);
+  },
+
   getFilteredBenches: () => {
-    const { benches, filters } = get();
+    const { benches, filters, favorites } = get();
     return benches.filter((bench) => {
+      if (filters.onlyFavorites && !favorites.includes(bench.id)) return false;
       if (bench.overallScore < filters.minOverallScore) return false;
       if (bench.comfortScore < filters.minComfortScore) return false;
       if (bench.shadeScore < filters.minShadeScore) return false;

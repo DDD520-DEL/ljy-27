@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Star, Sofa, Trees, Eye, Filter, RotateCcw } from 'lucide-react';
+import { X, Star, Sofa, Trees, Eye, Filter, RotateCcw, Heart } from 'lucide-react';
 import { RatingStars } from '../AddBench/RatingStars';
 import type { FilterOptions, BenchType } from '../../types/bench';
 import { getBenchTypeLabel } from '../../utils/score';
@@ -34,7 +34,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     filters.minComfortScore > 0 ||
     filters.minShadeScore > 0 ||
     filters.minViewScore > 0 ||
-    filters.benchTypes.length > 0;
+    filters.benchTypes.length > 0 ||
+    filters.onlyFavorites;
 
   return (
     <div
@@ -186,6 +187,21 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 );
               })}
             </div>
+          </div>
+
+          <div>
+            <label className="font-medium text-gray-700 block mb-3">快捷筛选</label>
+            <button
+              onClick={() => onFilterChange({ onlyFavorites: !filters.onlyFavorites })}
+              className={`w-full px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-3 ${
+                filters.onlyFavorites
+                  ? 'bg-red-500 text-white shadow-md'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-red-300'
+              }`}
+            >
+              <Heart size={18} fill={filters.onlyFavorites ? 'currentColor' : 'none'} />
+              仅看我的收藏
+            </button>
           </div>
         </div>
 

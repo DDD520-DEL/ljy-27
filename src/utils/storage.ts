@@ -3,6 +3,7 @@ import { mockBenches } from '../data/mockBenches';
 
 const STORAGE_KEY = 'park_bench_data';
 const COMMENTS_STORAGE_KEY = 'park_bench_comments';
+const FAVORITES_STORAGE_KEY = 'park_bench_favorites';
 
 export function loadBenches(): Bench[] {
   try {
@@ -58,4 +59,24 @@ export function getCommentCountByBenchId(benchId: string): number {
     count += comment.replies.filter((r) => !r.isDeleted).length;
   });
   return count;
+}
+
+export function loadFavorites(): string[] {
+  try {
+    const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load favorites from storage:', e);
+  }
+  return [];
+}
+
+export function saveFavorites(favorites: string[]): void {
+  try {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+  } catch (e) {
+    console.error('Failed to save favorites to storage:', e);
+  }
 }

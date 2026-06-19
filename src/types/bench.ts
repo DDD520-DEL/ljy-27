@@ -24,6 +24,7 @@ export interface FilterOptions {
   minViewScore: number;
   searchKeyword: string;
   benchTypes: BenchType[];
+  onlyFavorites: boolean;
 }
 
 export interface NewBenchData {

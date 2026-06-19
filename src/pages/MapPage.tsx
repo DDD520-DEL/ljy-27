@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle } from 'lucide-react';
+import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
 import { BenchDetailPanel } from '../components/BenchDetail/BenchDetailPanel';
 import { FilterSidebar } from '../components/Filter/FilterSidebar';
@@ -18,11 +18,14 @@ export const MapPage: React.FC = () => {
     isDetailOpen,
     initBenches,
     initComments,
+    initFavorites,
     setSelectedBench,
     updateFilters,
     resetFilters,
     toggleFilter,
     toggleDetail,
+    toggleFavorite,
+    isFavorite,
     getFilteredBenches,
     getSelectedBench,
     getCommentCountByBenchId,
@@ -67,7 +70,8 @@ export const MapPage: React.FC = () => {
       initBenches();
     }
     initComments();
-  }, [benches.length, initBenches, initComments]);
+    initFavorites();
+  }, [benches.length, initBenches, initComments, initFavorites]);
 
   const filteredBenches = getFilteredBenches();
   const selectedBench = getSelectedBench();
@@ -269,12 +273,29 @@ export const MapPage: React.FC = () => {
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-gray-800 text-lg">
-                        {selectedBench.parkName}
-                      </h3>
-                      <p className="text-sm text-gray-500 truncate">
-                        {selectedBench.locationDesc}
-                      </p>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-gray-800 text-lg">
+                            {selectedBench.parkName}
+                          </h3>
+                          <p className="text-sm text-gray-500 truncate">
+                            {selectedBench.locationDesc}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(selectedBench.id);
+                          }}
+                          className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                            isFavorite(selectedBench.id)
+                              ? 'bg-red-100 text-red-500'
+                              : 'bg-gray-100 text-gray-400'
+                          }`}
+                        >
+                          <Heart size={20} fill={isFavorite(selectedBench.id) ? 'currentColor' : 'none'} />
+                        </button>
+                      </div>
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <span
                           className="text-lg font-bold"

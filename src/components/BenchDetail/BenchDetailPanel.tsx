@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, MapPin, Navigation, MessageSquare, ExternalLink } from 'lucide-react';
+import { X, MapPin, Navigation, MessageSquare, ExternalLink, Heart } from 'lucide-react';
 import { ScoreCard } from './ScoreCard';
 import { PhotoGallery } from './PhotoGallery';
 import { CommentSection } from './CommentSection';
@@ -20,8 +20,13 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
 }) => {
   const overallColor = getScoreColor(bench.overallScore);
   const [showNavOptions, setShowNavOptions] = useState(false);
-  const { getCommentCountByBenchId } = useBenchStore();
+  const { getCommentCountByBenchId, isFavorite, toggleFavorite } = useBenchStore();
   const commentCount = getCommentCountByBenchId(bench.id);
+  const favorited = isFavorite(bench.id);
+
+  const handleFavoriteClick = () => {
+    toggleFavorite(bench.id);
+  };
 
   const handleNavigate = (type: 'amap' | 'baidu' | 'qq') => {
     const { lat, lng, parkName, locationDesc } = bench;
@@ -63,12 +68,24 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors"
-          >
-            <X size={20} />
-          </button>
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <button
+              onClick={handleFavoriteClick}
+              className={`w-9 h-9 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors ${
+                favorited
+                  ? 'bg-red-500 text-white'
+                  : 'bg-white/20 text-white hover:bg-white/30'
+              }`}
+            >
+              <Heart size={20} fill={favorited ? 'currentColor' : 'none'} />
+            </button>
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors"
+            >
+              <X size={20} />
+            </button>
+          </div>
 
           <div className="absolute bottom-4 left-5 right-5">
             <h2 className="text-2xl font-bold text-white mb-1">{bench.parkName}</h2>
