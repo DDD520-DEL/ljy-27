@@ -2,6 +2,11 @@ import { create } from 'zustand';
 import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord } from '../types/bench';
 import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
+import { calculateDistance } from '../lib/utils';
+
+export interface NearbyBench extends Bench {
+  distance: number;
+}
 
 interface BenchState {
   benches: Bench[];
@@ -36,6 +41,7 @@ interface BenchState {
   getCommentCountByBenchId: (benchId: string) => number;
   getCheckInCountByBenchId: (benchId: string) => number;
   getTotalCheckInCount: () => number;
+  getNearbyBenches: (benchId: string, radiusMeters?: number) => NearbyBench[];
 }
 
 const defaultFilters: FilterOptions = {
@@ -272,5 +278,25 @@ export const useBenchStore = create<BenchState>((set, get) => ({
 
   getTotalCheckInCount: () => {
     return get().checkIns.length;
+  },
+
+  getNearbyBenches: (benchId, radiusMeters = 1000) => {
+    const { benches } = get();
+    const currentBench = benches.find((b) => b.id === benchId);
+    if (!currentBench) return [];
+
+    return benches
+      .filter((b) => b.id !== benchId)
+      .map((b) => ({
+        ...b,
+        distance: calculateDistance(
+          currentBench.lat,
+          currentBench.lng,
+          b.lat,
+          b.lng
+        ),
+      }))
+      .filter((b) => b.distance <= radiusMeters)
+      .sort((a, b) => a.distance - b.distance);
   },
 }));

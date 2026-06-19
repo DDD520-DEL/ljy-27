@@ -107,6 +107,19 @@ export const MapView: React.FC<MapViewProps> = ({
             />
           </>
         )}
+        {selectedBench && (
+          <Circle
+            center={[selectedBench.lat, selectedBench.lng]}
+            radius={1000}
+            pathOptions={{
+              color: '#10B981',
+              fillColor: '#10B981',
+              fillOpacity: 0.08,
+              weight: 2,
+              dashArray: '8, 8',
+            }}
+          />
+        )}
         {benches.map((bench) => (
           <BenchMarker
             key={bench.id}

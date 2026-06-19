@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { X, MapPin, Navigation, MessageSquare, ExternalLink, Heart, Check } from 'lucide-react';
+import { X, MapPin, Navigation, MessageSquare, ExternalLink, Heart, Check, Users, Star, ChevronRight } from 'lucide-react';
 import { ScoreCard } from './ScoreCard';
 import { PhotoGallery } from './PhotoGallery';
 import { CommentSection } from './CommentSection';
 import type { Bench } from '../../types/bench';
 import { getScoreColor, getScoreLabel } from '../../utils/score';
-import { useBenchStore } from '../../store/useBenchStore';
+import { useBenchStore, type NearbyBench } from '../../store/useBenchStore';
+import { formatDistance } from '../../lib/utils';
 
 interface BenchDetailPanelProps {
   bench: Bench;
@@ -21,10 +22,19 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
   const overallColor = getScoreColor(bench.overallScore);
   const [showNavOptions, setShowNavOptions] = useState(false);
   const [checkingIn, setCheckingIn] = useState(false);
-  const { getCommentCountByBenchId, isFavorite, toggleFavorite, addCheckIn, getCheckInCountByBenchId } = useBenchStore();
+  const {
+    getCommentCountByBenchId,
+    isFavorite,
+    toggleFavorite,
+    addCheckIn,
+    getCheckInCountByBenchId,
+    getNearbyBenches,
+    setSelectedBench,
+  } = useBenchStore();
   const commentCount = getCommentCountByBenchId(bench.id);
   const favorited = isFavorite(bench.id);
   const checkInCount = getCheckInCountByBenchId(bench.id);
+  const nearbyBenches: NearbyBench[] = getNearbyBenches(bench.id, 1000);
 
   const handleFavoriteClick = () => {
     toggleFavorite(bench.id);
@@ -58,6 +68,10 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
 
     window.open(url, '_blank', 'noopener,noreferrer');
     setShowNavOptions(false);
+  };
+
+  const handleNearbyBenchClick = (nearbyBenchId: string) => {
+    setSelectedBench(nearbyBenchId);
   };
 
   return (
@@ -204,6 +218,71 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
                 >
                   取消
                 </button>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-2 mb-3">
+              <Users size={18} className="text-emerald-600" />
+              <h3 className="font-bold text-gray-800">周边长椅</h3>
+              <span className="text-xs text-gray-400 ml-auto">1公里范围内</span>
+            </div>
+            {nearbyBenches.length === 0 ? (
+              <div className="text-center py-6 text-gray-400 text-sm">
+                暂无周边长椅
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {nearbyBenches.map((nearby) => (
+                  <button
+                    key={nearby.id}
+                    onClick={() => handleNearbyBenchClick(nearby.id)}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 transition-colors text-left group"
+                  >
+                    <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      {nearby.photos[0] ? (
+                        <img
+                          src={nearby.photos[0]}
+                          alt={nearby.parkName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <MapPin size={20} className="text-emerald-600" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-gray-800 text-sm truncate">
+                          {nearby.parkName}
+                        </p>
+                      </div>
+                      <p className="text-xs text-gray-500 truncate">
+                        {nearby.locationDesc}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span
+                          className="text-sm font-bold"
+                          style={{ color: getScoreColor(nearby.overallScore) }}
+                        >
+                          {nearby.overallScore.toFixed(1)}
+                        </span>
+                        <Star
+                          size={12}
+                          className="text-amber-400"
+                          fill="currentColor"
+                        />
+                        <span className="text-xs text-emerald-600 font-medium">
+                          {formatDistance(nearby.distance)}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight
+                      size={18}
+                      className="text-gray-300 group-hover:text-emerald-500 transition-colors flex-shrink-0"
+                    />
+                  </button>
+                ))}
               </div>
             )}
           </div>
