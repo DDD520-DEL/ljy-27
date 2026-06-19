@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, MapPin, Navigation, MessageSquare, ExternalLink, Heart } from 'lucide-react';
+import { X, MapPin, Navigation, MessageSquare, ExternalLink, Heart, Check } from 'lucide-react';
 import { ScoreCard } from './ScoreCard';
 import { PhotoGallery } from './PhotoGallery';
 import { CommentSection } from './CommentSection';
@@ -20,12 +20,23 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
 }) => {
   const overallColor = getScoreColor(bench.overallScore);
   const [showNavOptions, setShowNavOptions] = useState(false);
-  const { getCommentCountByBenchId, isFavorite, toggleFavorite } = useBenchStore();
+  const [checkingIn, setCheckingIn] = useState(false);
+  const { getCommentCountByBenchId, isFavorite, toggleFavorite, addCheckIn, getCheckInCountByBenchId } = useBenchStore();
   const commentCount = getCommentCountByBenchId(bench.id);
   const favorited = isFavorite(bench.id);
+  const checkInCount = getCheckInCountByBenchId(bench.id);
 
   const handleFavoriteClick = () => {
     toggleFavorite(bench.id);
+  };
+
+  const handleCheckIn = () => {
+    if (checkingIn) return;
+    setCheckingIn(true);
+    addCheckIn(bench);
+    setTimeout(() => {
+      setCheckingIn(false);
+    }, 1000);
   };
 
   const handleNavigate = (type: 'amap' | 'baidu' | 'qq') => {
@@ -105,13 +116,26 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
               {getScoreLabel(bench.overallScore)}
             </span>
             <span className="text-sm text-gray-500">
-              {bench.checkinCount} 位遛弯族推荐
+              {checkInCount} 位遛弯族推荐
             </span>
             <span className="text-sm text-gray-500 flex items-center gap-1">
               <MessageSquare size={14} className="text-emerald-600" />
               {commentCount} 条评论
             </span>
           </div>
+
+          <button
+            onClick={handleCheckIn}
+            disabled={checkingIn}
+            className={`w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all ${
+              checkingIn
+                ? 'bg-emerald-100 text-emerald-700 cursor-not-allowed'
+                : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md hover:shadow-lg'
+            }`}
+          >
+            <Check size={18} />
+            {checkingIn ? '签到成功！' : '我要签到'}
+          </button>
 
           <ScoreCard bench={bench} />
 

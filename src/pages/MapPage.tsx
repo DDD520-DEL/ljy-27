@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart } from 'lucide-react';
+import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
 import { BenchDetailPanel } from '../components/BenchDetail/BenchDetailPanel';
 import { FilterSidebar } from '../components/Filter/FilterSidebar';
@@ -19,6 +19,7 @@ export const MapPage: React.FC = () => {
     initBenches,
     initComments,
     initFavorites,
+    initCheckIns,
     setSelectedBench,
     updateFilters,
     resetFilters,
@@ -29,6 +30,8 @@ export const MapPage: React.FC = () => {
     getFilteredBenches,
     getSelectedBench,
     getCommentCountByBenchId,
+    getTotalCheckInCount,
+    getCheckInCountByBenchId,
   } = useBenchStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -71,7 +74,8 @@ export const MapPage: React.FC = () => {
     }
     initComments();
     initFavorites();
-  }, [benches.length, initBenches, initComments, initFavorites]);
+    initCheckIns();
+  }, [benches.length, initBenches, initComments, initFavorites, initCheckIns]);
 
   const filteredBenches = getFilteredBenches();
   const selectedBench = getSelectedBench();
@@ -180,6 +184,25 @@ export const MapPage: React.FC = () => {
               }`}
             >
               <Filter size={20} />
+            </button>
+
+            <button
+              onClick={() => {
+                navigate('/footprint');
+                clearLocateError();
+              }}
+              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all relative ${
+                getTotalCheckInCount() > 0
+                  ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <Footprints size={20} />
+              {getTotalCheckInCount() > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {getTotalCheckInCount()}
+                </span>
+              )}
             </button>
 
             <button
@@ -304,7 +327,7 @@ export const MapPage: React.FC = () => {
                           {selectedBench.overallScore.toFixed(1)}
                         </span>
                         <span className="text-xs text-gray-400">
-                          {selectedBench.checkinCount} 人打卡
+                          {getCheckInCountByBenchId(selectedBench.id)} 人打卡
                         </span>
                         <span className="text-xs text-gray-400 flex items-center gap-1">
                           <MessageSquare size={12} className="text-emerald-600" />

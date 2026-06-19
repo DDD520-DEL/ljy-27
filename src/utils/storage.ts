@@ -1,9 +1,10 @@
-import type { Bench, Comment } from '../types/bench';
+import type { Bench, Comment, CheckInRecord } from '../types/bench';
 import { mockBenches } from '../data/mockBenches';
 
 const STORAGE_KEY = 'park_bench_data';
 const COMMENTS_STORAGE_KEY = 'park_bench_comments';
 const FAVORITES_STORAGE_KEY = 'park_bench_favorites';
+const CHECKINS_STORAGE_KEY = 'park_bench_checkins';
 
 export function loadBenches(): Bench[] {
   try {
@@ -79,4 +80,29 @@ export function saveFavorites(favorites: string[]): void {
   } catch (e) {
     console.error('Failed to save favorites to storage:', e);
   }
+}
+
+export function loadCheckIns(): CheckInRecord[] {
+  try {
+    const stored = localStorage.getItem(CHECKINS_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load check-ins from storage:', e);
+  }
+  return [];
+}
+
+export function saveCheckIns(checkIns: CheckInRecord[]): void {
+  try {
+    localStorage.setItem(CHECKINS_STORAGE_KEY, JSON.stringify(checkIns));
+  } catch (e) {
+    console.error('Failed to save check-ins to storage:', e);
+  }
+}
+
+export function getCheckInCountByBenchId(benchId: string): number {
+  const checkIns = loadCheckIns();
+  return checkIns.filter((c) => c.benchId === benchId).length;
 }

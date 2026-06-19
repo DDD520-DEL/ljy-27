@@ -72,3 +72,18 @@ export interface NewReplyData {
   author: string;
   replyTo?: string;
 }
+
+export interface CheckInRecord {
+  id: string;
+  benchId: string;
+  parkName: string;
+  locationDesc: string;
+  benchType: BenchType;
+  comfortScore: number;
+  shadeScore: number;
+  viewScore: number;
+  overallScore: number;
+  photos: string[];
+  note: string;
+  createdAt: string;
+}

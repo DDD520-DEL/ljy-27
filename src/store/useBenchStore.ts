@@ -1,12 +1,13 @@
 import { create } from 'zustand';
-import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData } from '../types/bench';
-import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites } from '../utils/storage';
+import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord } from '../types/bench';
+import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 
 interface BenchState {
   benches: Bench[];
   comments: Comment[];
   favorites: string[];
+  checkIns: CheckInRecord[];
   selectedBenchId: string | null;
   filters: FilterOptions;
   isFilterOpen: boolean;
@@ -15,8 +16,10 @@ interface BenchState {
   initBenches: () => void;
   initComments: () => void;
   initFavorites: () => void;
+  initCheckIns: () => void;
   setSelectedBench: (id: string | null) => void;
   addBench: (data: NewBenchData) => void;
+  addCheckIn: (bench: Bench) => void;
   updateFilters: (filters: Partial<FilterOptions>) => void;
   resetFilters: () => void;
   toggleFilter: () => void;
@@ -31,6 +34,8 @@ interface BenchState {
   deleteReply: (commentId: string, replyId: string, benchId: string) => void;
   getCommentsByBenchId: (benchId: string) => Comment[];
   getCommentCountByBenchId: (benchId: string) => number;
+  getCheckInCountByBenchId: (benchId: string) => number;
+  getTotalCheckInCount: () => number;
 }
 
 const defaultFilters: FilterOptions = {
@@ -47,6 +52,7 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   benches: [],
   comments: [],
   favorites: [],
+  checkIns: [],
   selectedBenchId: null,
   filters: defaultFilters,
   isFilterOpen: false,
@@ -67,6 +73,11 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     set({ favorites });
   },
 
+  initCheckIns: () => {
+    const checkIns = loadCheckIns();
+    set({ checkIns });
+  },
+
   setSelectedBench: (id) => {
     set({ selectedBenchId: id, isDetailOpen: id !== null });
   },
@@ -85,6 +96,34 @@ export const useBenchStore = create<BenchState>((set, get) => ({
       checkinCount: 1,
     };
     const benches = [...get().benches, newBench];
+    set({ benches });
+    saveBenches(benches);
+    
+    get().addCheckIn(newBench);
+  },
+
+  addCheckIn: (bench) => {
+    const newCheckIn: CheckInRecord = {
+      id: generateId(),
+      benchId: bench.id,
+      parkName: bench.parkName,
+      locationDesc: bench.locationDesc,
+      benchType: bench.benchType,
+      comfortScore: bench.comfortScore,
+      shadeScore: bench.shadeScore,
+      viewScore: bench.viewScore,
+      overallScore: bench.overallScore,
+      photos: bench.photos,
+      note: bench.note,
+      createdAt: new Date().toISOString(),
+    };
+    const checkIns = [...get().checkIns, newCheckIn];
+    set({ checkIns });
+    saveCheckIns(checkIns);
+
+    const benches = get().benches.map((b) =>
+      b.id === bench.id ? { ...b, checkinCount: b.checkinCount + 1 } : b
+    );
     set({ benches });
     saveBenches(benches);
   },
@@ -225,5 +264,13 @@ export const useBenchStore = create<BenchState>((set, get) => ({
 
   getCommentCountByBenchId: (benchId) => {
     return getCommentCountByBenchId(benchId);
+  },
+
+  getCheckInCountByBenchId: (benchId) => {
+    return get().checkIns.filter((c) => c.benchId === benchId).length;
+  },
+
+  getTotalCheckInCount: () => {
+    return get().checkIns.length;
   },
 }));
