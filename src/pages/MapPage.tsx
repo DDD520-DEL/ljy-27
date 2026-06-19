@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints } from 'lucide-react';
+import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
 import { BenchDetailPanel } from '../components/BenchDetail/BenchDetailPanel';
 import { FilterSidebar } from '../components/Filter/FilterSidebar';
@@ -32,6 +32,7 @@ export const MapPage: React.FC = () => {
     getCommentCountByBenchId,
     getTotalCheckInCount,
     getCheckInCountByBenchId,
+    addCheckIn,
   } = useBenchStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -39,6 +40,7 @@ export const MapPage: React.FC = () => {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
+  const [mobileCheckingIn, setMobileCheckingIn] = useState(false);
   const errorTimerRef = React.useRef<number | null>(null);
 
   const clearLocateError = React.useCallback(() => {
@@ -92,6 +94,15 @@ export const MapPage: React.FC = () => {
   const handleCloseDetail = () => {
     setSelectedBench(null);
     setShowMobileDetail(false);
+  };
+
+  const handleMobileCheckIn = () => {
+    if (mobileCheckingIn || !selectedBench) return;
+    setMobileCheckingIn(true);
+    addCheckIn(selectedBench);
+    setTimeout(() => {
+      setMobileCheckingIn(false);
+    }, 1000);
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -336,9 +347,23 @@ export const MapPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
+
+                  <button
+                    onClick={handleMobileCheckIn}
+                    disabled={mobileCheckingIn}
+                    className={`w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 mb-2 transition-all ${
+                      mobileCheckingIn
+                        ? 'bg-emerald-100 text-emerald-700 cursor-not-allowed'
+                        : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md'
+                    }`}
+                  >
+                    <Check size={18} />
+                    {mobileCheckingIn ? '签到成功！' : '我要签到'}
+                  </button>
+
                   <button
                     onClick={handleCloseDetail}
-                    className="w-full py-3 rounded-xl bg-emerald-600 text-white font-medium"
+                    className="w-full py-3 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                   >
                     查看详情
                   </button>
