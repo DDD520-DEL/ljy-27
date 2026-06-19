@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, MapPin, Locate } from 'lucide-react';
+import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
 import { BenchDetailPanel } from '../components/BenchDetail/BenchDetailPanel';
 import { FilterSidebar } from '../components/Filter/FilterSidebar';
@@ -27,6 +27,9 @@ export const MapPage: React.FC = () => {
 
   const [searchValue, setSearchValue] = useState('');
   const [showMobileDetail, setShowMobileDetail] = useState(false);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [locateError, setLocateError] = useState<string | null>(null);
 
   useEffect(() => {
     if (benches.length === 0) {
@@ -55,16 +58,44 @@ export const MapPage: React.FC = () => {
   };
 
   const handleLocate = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log('Current position:', position.coords);
-        },
-        (error) => {
-          console.log('Geolocation error:', error);
-        }
-      );
+    if (!navigator.geolocation) {
+      setLocateError('您的浏览器不支持地理定位');
+      return;
     }
+
+    setIsLocating(true);
+    setLocateError(null);
+    setUserLocation(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation([latitude, longitude]);
+        setIsLocating(false);
+        setLocateError(null);
+      },
+      (error) => {
+        setIsLocating(false);
+        let errorMessage = '定位失败';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = '您拒绝了位置权限，请在浏览器设置中开启';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = '位置信息不可用';
+            break;
+          case error.TIMEOUT:
+            errorMessage = '定位超时，请重试';
+            break;
+        }
+        setLocateError(errorMessage);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
   };
 
   return (
@@ -137,15 +168,35 @@ export const MapPage: React.FC = () => {
           onBenchClick={handleBenchClick}
           center={[39.9339, 116.4044]}
           zoom={12}
+          userLocation={userLocation}
         />
       </div>
 
-      <button
-        onClick={handleLocate}
-        className="absolute bottom-6 right-6 z-20 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-gray-600 hover:text-emerald-600 hover:shadow-xl transition-all"
-      >
-        <Locate size={22} />
-      </button>
+      <div className="absolute bottom-6 right-6 z-20 flex flex-col gap-2">
+        {locateError && (
+          <div className="bg-red-500 text-white px-3 py-2 rounded-xl text-xs shadow-lg max-w-[200px] flex items-start gap-2">
+            <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
+            <span>{locateError}</span>
+          </div>
+        )}
+        <button
+          onClick={handleLocate}
+          disabled={isLocating}
+          className={`w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center transition-all ${
+            isLocating
+              ? 'text-emerald-600 cursor-wait'
+              : userLocation
+              ? 'text-emerald-600 hover:shadow-xl'
+              : 'text-gray-600 hover:text-emerald-600 hover:shadow-xl'
+          }`}
+        >
+          {isLocating ? (
+            <Loader2 size={22} className="animate-spin" />
+          ) : (
+            <Locate size={22} />
+          )}
+        </button>
+      </div>
 
       {selectedBench && (
         <BenchDetailPanel

@@ -14,21 +14,38 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
     const remaining = maxPhotos - photos.length;
+    if (remaining <= 0) {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
     const filesToProcess = Array.from(files).slice(0, remaining);
 
-    filesToProcess.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result as string;
-        onChange([...photos, result]);
-      };
-      reader.readAsDataURL(file);
-    });
+    const readFile = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const result = event.target?.result as string;
+          resolve(result);
+        };
+        reader.onerror = () => reject(new Error('读取文件失败'));
+        reader.readAsDataURL(file);
+      });
+    };
+
+    try {
+      const newPhotos = await Promise.all(filesToProcess.map(readFile));
+      onChange([...photos, ...newPhotos]);
+    } catch (err) {
+      console.error('照片读取失败:', err);
+    }
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';

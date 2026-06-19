@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, MapPin, Navigation, MessageSquare } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, MapPin, Navigation, MessageSquare, ExternalLink } from 'lucide-react';
 import { ScoreCard } from './ScoreCard';
 import { PhotoGallery } from './PhotoGallery';
 import type { Bench } from '../../types/bench';
@@ -17,6 +17,28 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
   isOpen,
 }) => {
   const overallColor = getScoreColor(bench.overallScore);
+  const [showNavOptions, setShowNavOptions] = useState(false);
+
+  const handleNavigate = (type: 'amap' | 'baidu' | 'qq') => {
+    const { lat, lng, parkName, locationDesc } = bench;
+    const name = encodeURIComponent(`${parkName} - ${locationDesc}`);
+    let url = '';
+
+    switch (type) {
+      case 'amap':
+        url = `https://uri.amap.com/marker?position=${lng},${lat}&name=${name}&src=parkbench`;
+        break;
+      case 'baidu':
+        url = `http://api.map.baidu.com/marker?location=${lat},${lng}&title=${name}&content=${name}&output=html&src=parkbench`;
+        break;
+      case 'qq':
+        url = `https://apis.map.qq.com/uri/v1/marker?marker=coord:${lat},${lng};title:${name};addr:${name}&referer=parkbench`;
+        break;
+    }
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setShowNavOptions(false);
+  };
 
   return (
     <div
@@ -85,7 +107,7 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
               <Navigation size={18} className="text-emerald-600" />
               <h3 className="font-bold text-gray-800">位置信息</h3>
             </div>
-            <div className="space-y-2 text-sm text-gray-600">
+            <div className="space-y-2 text-sm text-gray-600 mb-4">
               <p>
                 <span className="text-gray-400">纬度：</span>
                 {bench.lat.toFixed(4)}
@@ -95,9 +117,46 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
                 {bench.lng.toFixed(4)}
               </p>
             </div>
-            <button className="w-full mt-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 font-medium text-sm hover:bg-emerald-100 transition-colors">
-              打开地图导航
-            </button>
+
+            {!showNavOptions ? (
+              <button
+                onClick={() => setShowNavOptions(true)}
+                className="w-full py-2.5 rounded-xl bg-emerald-50 text-emerald-700 font-medium text-sm hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
+              >
+                <Navigation size={16} />
+                打开地图导航
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <button
+                  onClick={() => handleNavigate('amap')}
+                  className="w-full py-2.5 px-4 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium text-sm hover:border-emerald-400 hover:bg-emerald-50 transition-all flex items-center justify-between"
+                >
+                  <span>高德地图导航</span>
+                  <ExternalLink size={14} className="text-gray-400" />
+                </button>
+                <button
+                  onClick={() => handleNavigate('baidu')}
+                  className="w-full py-2.5 px-4 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium text-sm hover:border-emerald-400 hover:bg-emerald-50 transition-all flex items-center justify-between"
+                >
+                  <span>百度地图导航</span>
+                  <ExternalLink size={14} className="text-gray-400" />
+                </button>
+                <button
+                  onClick={() => handleNavigate('qq')}
+                  className="w-full py-2.5 px-4 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium text-sm hover:border-emerald-400 hover:bg-emerald-50 transition-all flex items-center justify-between"
+                >
+                  <span>腾讯地图导航</span>
+                  <ExternalLink size={14} className="text-gray-400" />
+                </button>
+                <button
+                  onClick={() => setShowNavOptions(false)}
+                  className="w-full py-2 text-gray-400 text-xs hover:text-gray-600 transition-colors"
+                >
+                  取消
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
