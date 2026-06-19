@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { X, MapPin, Navigation, MessageSquare, ExternalLink } from 'lucide-react';
 import { ScoreCard } from './ScoreCard';
 import { PhotoGallery } from './PhotoGallery';
+import { CommentSection } from './CommentSection';
 import type { Bench } from '../../types/bench';
 import { getScoreColor, getScoreLabel } from '../../utils/score';
+import { useBenchStore } from '../../store/useBenchStore';
 
 interface BenchDetailPanelProps {
   bench: Bench;
@@ -18,6 +20,8 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
 }) => {
   const overallColor = getScoreColor(bench.overallScore);
   const [showNavOptions, setShowNavOptions] = useState(false);
+  const { getCommentCountByBenchId } = useBenchStore();
+  const commentCount = getCommentCountByBenchId(bench.id);
 
   const handleNavigate = (type: 'amap' | 'baidu' | 'qq') => {
     const { lat, lng, parkName, locationDesc } = bench;
@@ -76,7 +80,7 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <span
               className="px-3 py-1 rounded-full text-sm font-medium text-white"
               style={{ backgroundColor: overallColor }}
@@ -85,6 +89,10 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
             </span>
             <span className="text-sm text-gray-500">
               {bench.checkinCount} 位遛弯族推荐
+            </span>
+            <span className="text-sm text-gray-500 flex items-center gap-1">
+              <MessageSquare size={14} className="text-emerald-600" />
+              {commentCount} 条评论
             </span>
           </div>
 
@@ -158,6 +166,8 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
               </div>
             )}
           </div>
+
+          <CommentSection benchId={bench.id} />
         </div>
       </div>
     </div>

@@ -1,8 +1,10 @@
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import { MessageSquare } from 'lucide-react';
 import type { Bench } from '../../types/bench';
 import { getScoreColor } from '../../utils/score';
+import { useBenchStore } from '../../store/useBenchStore';
 
 interface BenchMarkerProps {
   bench: Bench;
@@ -50,6 +52,8 @@ export const BenchMarker: React.FC<BenchMarkerProps> = ({
 }) => {
   const color = getScoreColor(bench.overallScore);
   const icon = createCustomIcon(color, isSelected);
+  const { getCommentCountByBenchId } = useBenchStore();
+  const commentCount = getCommentCountByBenchId(bench.id);
 
   return (
     <Marker
@@ -68,7 +72,7 @@ export const BenchMarker: React.FC<BenchMarkerProps> = ({
           )}
           <h3 className="font-bold text-gray-800 text-sm">{bench.parkName}</h3>
           <p className="text-xs text-gray-500 mb-2">{bench.locationDesc}</p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span
               className="text-sm font-bold"
               style={{ color }}
@@ -77,6 +81,10 @@ export const BenchMarker: React.FC<BenchMarkerProps> = ({
             </span>
             <span className="text-xs text-gray-400">
               {bench.checkinCount} 人打卡
+            </span>
+            <span className="text-xs text-gray-400 flex items-center gap-1">
+              <MessageSquare size={12} className="text-emerald-600" />
+              {commentCount}
             </span>
           </div>
         </div>

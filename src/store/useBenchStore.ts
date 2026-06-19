@@ -1,16 +1,18 @@
 import { create } from 'zustand';
-import type { Bench, FilterOptions, NewBenchData } from '../types/bench';
-import { loadBenches, saveBenches } from '../utils/storage';
+import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData } from '../types/bench';
+import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 
 interface BenchState {
   benches: Bench[];
+  comments: Comment[];
   selectedBenchId: string | null;
   filters: FilterOptions;
   isFilterOpen: boolean;
   isDetailOpen: boolean;
 
   initBenches: () => void;
+  initComments: () => void;
   setSelectedBench: (id: string | null) => void;
   addBench: (data: NewBenchData) => void;
   updateFilters: (filters: Partial<FilterOptions>) => void;
@@ -19,6 +21,12 @@ interface BenchState {
   toggleDetail: () => void;
   getFilteredBenches: () => Bench[];
   getSelectedBench: () => Bench | undefined;
+  addComment: (data: NewCommentData) => void;
+  addReply: (data: NewReplyData) => void;
+  deleteComment: (commentId: string, benchId: string) => void;
+  deleteReply: (commentId: string, replyId: string, benchId: string) => void;
+  getCommentsByBenchId: (benchId: string) => Comment[];
+  getCommentCountByBenchId: (benchId: string) => number;
 }
 
 const defaultFilters: FilterOptions = {
@@ -32,6 +40,7 @@ const defaultFilters: FilterOptions = {
 
 export const useBenchStore = create<BenchState>((set, get) => ({
   benches: [],
+  comments: [],
   selectedBenchId: null,
   filters: defaultFilters,
   isFilterOpen: false,
@@ -40,6 +49,11 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   initBenches: () => {
     const benches = loadBenches();
     set({ benches });
+  },
+
+  initComments: () => {
+    const comments = loadComments();
+    set({ comments });
   },
 
   setSelectedBench: (id) => {
@@ -107,5 +121,84 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   getSelectedBench: () => {
     const { benches, selectedBenchId } = get();
     return benches.find((b) => b.id === selectedBenchId);
+  },
+
+  addComment: (data) => {
+    const newComment: Comment = {
+      id: generateId(),
+      benchId: data.benchId,
+      content: data.content,
+      author: data.author,
+      createdAt: new Date().toISOString(),
+      replies: [],
+      isDeleted: false,
+    };
+    const comments = [...get().comments, newComment];
+    set({ comments });
+    saveComments(comments);
+  },
+
+  addReply: (data) => {
+    const comments = get().comments.map((comment) => {
+      if (comment.id === data.commentId) {
+        return {
+          ...comment,
+          replies: [
+            ...comment.replies,
+            {
+              id: generateId(),
+              content: data.content,
+              author: data.author,
+              createdAt: new Date().toISOString(),
+              replyTo: data.replyTo,
+              isDeleted: false,
+            },
+          ],
+        };
+      }
+      return comment;
+    });
+    set({ comments });
+    saveComments(comments);
+  },
+
+  deleteComment: (commentId, benchId) => {
+    const comments = get().comments.map((comment) => {
+      if (comment.id === commentId) {
+        return { ...comment, isDeleted: true };
+      }
+      return comment;
+    });
+    set({ comments });
+    saveComments(comments);
+  },
+
+  deleteReply: (commentId, replyId, benchId) => {
+    const comments = get().comments.map((comment) => {
+      if (comment.id === commentId) {
+        return {
+          ...comment,
+          replies: comment.replies.map((reply) => {
+            if (reply.id === replyId) {
+              return { ...reply, isDeleted: true };
+            }
+            return reply;
+          }),
+        };
+      }
+      return comment;
+    });
+    set({ comments });
+    saveComments(comments);
+  },
+
+  getCommentsByBenchId: (benchId) => {
+    return getCommentsByBenchId(benchId).sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  },
+
+  getCommentCountByBenchId: (benchId) => {
+    return getCommentCountByBenchId(benchId);
   },
 }));

@@ -38,3 +38,36 @@ export interface NewBenchData {
   photos: string[];
   note: string;
 }
+
+export interface Reply {
+  id: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  replyTo?: string;
+  isDeleted: boolean;
+}
+
+export interface Comment {
+  id: string;
+  benchId: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  replies: Reply[];
+  isDeleted: boolean;
+}
+
+export interface NewCommentData {
+  benchId: string;
+  content: string;
+  author: string;
+}
+
+export interface NewReplyData {
+  commentId: string;
+  benchId: string;
+  content: string;
+  author: string;
+  replyTo?: string;
+}

@@ -6,6 +6,7 @@ import { BenchDetailPanel } from '../components/BenchDetail/BenchDetailPanel';
 import { FilterSidebar } from '../components/Filter/FilterSidebar';
 import { useBenchStore } from '../store/useBenchStore';
 import { getScoreColor } from '../utils/score';
+import { MessageSquare } from 'lucide-react';
 
 export const MapPage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export const MapPage: React.FC = () => {
     isFilterOpen,
     isDetailOpen,
     initBenches,
+    initComments,
     setSelectedBench,
     updateFilters,
     resetFilters,
@@ -23,6 +25,7 @@ export const MapPage: React.FC = () => {
     toggleDetail,
     getFilteredBenches,
     getSelectedBench,
+    getCommentCountByBenchId,
   } = useBenchStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -63,7 +66,8 @@ export const MapPage: React.FC = () => {
     if (benches.length === 0) {
       initBenches();
     }
-  }, [benches.length, initBenches]);
+    initComments();
+  }, [benches.length, initBenches, initComments]);
 
   const filteredBenches = getFilteredBenches();
   const selectedBench = getSelectedBench();
@@ -271,7 +275,7 @@ export const MapPage: React.FC = () => {
                       <p className="text-sm text-gray-500 truncate">
                         {selectedBench.locationDesc}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <span
                           className="text-lg font-bold"
                           style={{ color: getScoreColor(selectedBench.overallScore) }}
@@ -280,6 +284,10 @@ export const MapPage: React.FC = () => {
                         </span>
                         <span className="text-xs text-gray-400">
                           {selectedBench.checkinCount} 人打卡
+                        </span>
+                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                          <MessageSquare size={12} className="text-emerald-600" />
+                          {getCommentCountByBenchId(selectedBench.id)} 条评论
                         </span>
                       </div>
                     </div>

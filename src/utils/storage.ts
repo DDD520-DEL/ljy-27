@@ -1,7 +1,8 @@
-import type { Bench } from '../types/bench';
+import type { Bench, Comment } from '../types/bench';
 import { mockBenches } from '../data/mockBenches';
 
 const STORAGE_KEY = 'park_bench_data';
+const COMMENTS_STORAGE_KEY = 'park_bench_comments';
 
 export function loadBenches(): Bench[] {
   try {
@@ -22,4 +23,39 @@ export function saveBenches(benches: Bench[]): void {
   } catch (e) {
     console.error('Failed to save benches to storage:', e);
   }
+}
+
+export function loadComments(): Comment[] {
+  try {
+    const stored = localStorage.getItem(COMMENTS_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load comments from storage:', e);
+  }
+  return [];
+}
+
+export function saveComments(comments: Comment[]): void {
+  try {
+    localStorage.setItem(COMMENTS_STORAGE_KEY, JSON.stringify(comments));
+  } catch (e) {
+    console.error('Failed to save comments to storage:', e);
+  }
+}
+
+export function getCommentsByBenchId(benchId: string): Comment[] {
+  const comments = loadComments();
+  return comments.filter((c) => c.benchId === benchId && !c.isDeleted);
+}
+
+export function getCommentCountByBenchId(benchId: string): number {
+  const comments = getCommentsByBenchId(benchId);
+  let count = 0;
+  comments.forEach((comment) => {
+    count++;
+    count += comment.replies.filter((r) => !r.isDeleted).length;
+  });
+  return count;
 }
