@@ -46,6 +46,7 @@ export const MapPage: React.FC = () => {
     isFavorite,
     getFilteredBenches,
     getSelectedBench,
+    getBenchById,
     getCommentCountByBenchId,
     getTotalCheckInCount,
     getCheckInCountByBenchId,
@@ -62,6 +63,8 @@ export const MapPage: React.FC = () => {
   const [mapView, setMapView] = useState<ShareMapView>({ lat: 39.9339, lng: 116.4044, zoom: 12 });
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < MOBILE_BREAKPOINT);
   const [isSharingLoading, setIsSharingLoading] = useState(false);
+  const [showBannedTip, setShowBannedTip] = useState(false);
+  const [bannedBenchName, setBannedBenchName] = useState('');
   const errorTimerRef = React.useRef<number | null>(null);
   const hasLoadedFromUrlRef = useRef(false);
   const pendingShareBenchRef = useRef<string | null>(null);
@@ -138,8 +141,14 @@ export const MapPage: React.FC = () => {
     }
 
     if (shareState.benchId) {
-      const bench = benches.find((b) => b.id === shareState.benchId);
+      const bench = getBenchById(shareState.benchId);
       if (bench) {
+        if (bench.isBanned) {
+          setBannedBenchName(bench.parkName);
+          setShowBannedTip(true);
+          hasLoadedFromUrlRef.current = true;
+          return;
+        }
         closeNicknameModal();
         setIsSharingLoading(true);
         pendingShareBenchRef.current = shareState.benchId;
@@ -527,6 +536,34 @@ export const MapPage: React.FC = () => {
         onReset={resetFilters}
         mapView={mapView}
       />
+
+      {showBannedTip && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#F8F5F0] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="p-6 text-center">
+              <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                <AlertCircle size={40} className="text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">长椅已下架</h3>
+              <p className="text-gray-600 mb-1">
+                您访问的长椅
+              </p>
+              <p className="text-gray-800 font-bold mb-4">
+                「{bannedBenchName}」
+              </p>
+              <p className="text-gray-500 text-sm mb-6">
+                由于收到举报并经审核确认，该长椅已从地图上下架，暂时无法查看详情。
+              </p>
+              <button
+                onClick={() => setShowBannedTip(false)}
+                className="w-full py-3 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors"
+              >
+                我知道了
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <NicknameModal />
     </div>

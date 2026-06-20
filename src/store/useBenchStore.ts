@@ -38,6 +38,7 @@ interface BenchState {
   getFilteredBenches: () => Bench[];
   getVisibleBenches: () => Bench[];
   getSelectedBench: () => Bench | undefined;
+  getBenchById: (id: string) => Bench | undefined;
   addComment: (data: NewCommentData) => void;
   addReply: (data: NewReplyData) => void;
   deleteComment: (commentId: string, benchId: string) => void;
@@ -263,6 +264,11 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     const bench = benches.find((b) => b.id === selectedBenchId);
     if (bench?.isBanned) return undefined;
     return bench;
+  },
+
+  getBenchById: (id) => {
+    const { benches } = get();
+    return benches.find((b) => b.id === id);
   },
 
   addComment: (data) => {
