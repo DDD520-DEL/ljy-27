@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, MapPin, Navigation, MessageSquare, ExternalLink, Heart, Check, Users, Star, ChevronRight } from 'lucide-react';
+import { X, MapPin, Navigation, MessageSquare, ExternalLink, Heart, Check, Users, Star, ChevronRight, Share2, Copy } from 'lucide-react';
 import { ScoreCard } from './ScoreCard';
 import { PhotoGallery } from './PhotoGallery';
 import { CommentSection } from './CommentSection';
@@ -7,6 +7,7 @@ import type { Bench } from '../../types/bench';
 import { getScoreColor, getScoreLabel } from '../../utils/score';
 import { useBenchStore, type NearbyBench } from '../../store/useBenchStore';
 import { formatDistance } from '../../lib/utils';
+import { encodeShareUrl, copyToClipboard } from '../../utils/share';
 
 interface BenchDetailPanelProps {
   bench: Bench;
@@ -22,6 +23,9 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
   const overallColor = getScoreColor(bench.overallScore);
   const [showNavOptions, setShowNavOptions] = useState(false);
   const [checkingIn, setCheckingIn] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [copied, setCopied] = useState(false);
   const {
     getCommentCountByBenchId,
     isFavorite,
@@ -74,6 +78,28 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
     setSelectedBench(nearbyBenchId);
   };
 
+  const handleShare = () => {
+    const url = encodeShareUrl({
+      benchId: bench.id,
+      mapView: {
+        lat: bench.lat,
+        lng: bench.lng,
+        zoom: 15,
+      },
+    });
+    setShareUrl(url);
+    setShowShareModal(true);
+    setCopied(false);
+  };
+
+  const handleCopyLink = async () => {
+    const success = await copyToClipboard(shareUrl);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   return (
     <div
       className={`fixed inset-y-0 left-0 w-96 bg-[#F8F5F0] shadow-2xl z-40 transform transition-transform duration-300 ease-out ${
@@ -94,6 +120,13 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
           <div className="absolute top-4 right-4 flex items-center gap-2">
+            <button
+              onClick={handleShare}
+              className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors"
+              title="分享"
+            >
+              <Share2 size={20} />
+            </button>
             <button
               onClick={handleFavoriteClick}
               className={`w-9 h-9 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors ${
@@ -290,6 +323,60 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
           <CommentSection benchId={bench.id} />
         </div>
       </div>
+
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#F8F5F0] rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="p-5 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Share2 size={20} className="text-emerald-600" />
+                  <h3 className="text-lg font-bold text-gray-800">分享长椅</h3>
+                </div>
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <p className="text-sm text-gray-600">
+                复制链接分享给好友，打开即可查看这个长椅的详情。
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={shareUrl}
+                  readOnly
+                  className="flex-1 px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-700 outline-none"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className={`px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-1.5 transition-all ${
+                    copied
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  }`}
+                >
+                  {copied ? (
+                    <>
+                      <Check size={16} />
+                      已复制
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={16} />
+                      复制
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

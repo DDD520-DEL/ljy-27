@@ -10,6 +10,7 @@ interface MapViewProps {
   selectedBenchId: string | null;
   onBenchClick: (id: string) => void;
   onMapClick?: (lat: number, lng: number) => void;
+  onViewChange?: (lat: number, lng: number, zoom: number) => void;
   center?: [number, number];
   zoom?: number;
   interactive?: boolean;
@@ -41,11 +42,43 @@ function MapController({ center, zoom }: { center?: [number, number]; zoom?: num
   return null;
 }
 
+function MapViewListener({ onViewChange }: { onViewChange?: (lat: number, lng: number, zoom: number) => void }) {
+  const map = useMap();
+  const onViewChangeRef = React.useRef(onViewChange);
+
+  useEffect(() => {
+    onViewChangeRef.current = onViewChange;
+  }, [onViewChange]);
+
+  useEffect(() => {
+    if (!onViewChangeRef.current) return;
+
+    const handleMove = () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      onViewChangeRef.current?.(center.lat, center.lng, zoom);
+    };
+
+    map.on('moveend', handleMove);
+    map.on('zoomend', handleMove);
+
+    handleMove();
+
+    return () => {
+      map.off('moveend', handleMove);
+      map.off('zoomend', handleMove);
+    };
+  }, [map]);
+
+  return null;
+}
+
 export const MapView: React.FC<MapViewProps> = ({
   benches,
   selectedBenchId,
   onBenchClick,
   onMapClick,
+  onViewChange,
   center = [39.9042, 116.4074],
   zoom = 11,
   interactive = true,
@@ -73,6 +106,7 @@ export const MapView: React.FC<MapViewProps> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapController center={mapCenter} zoom={selectedBench ? 15 : (userLocation ? 16 : zoom)} />
+        <MapViewListener onViewChange={onViewChange} />
         {interactive && <MapClickHandler onClick={onMapClick} />}
         {userLocation && (
           <>

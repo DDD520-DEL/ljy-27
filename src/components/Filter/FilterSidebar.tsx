@@ -1,8 +1,10 @@
-import React from 'react';
-import { X, Star, Sofa, Trees, Eye, Filter, RotateCcw, Heart } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Star, Sofa, Trees, Eye, Filter, RotateCcw, Heart, Share2, Copy, Check } from 'lucide-react';
 import { RatingStars } from '../AddBench/RatingStars';
 import type { FilterOptions, BenchType } from '../../types/bench';
 import { getBenchTypeLabel } from '../../utils/score';
+import { encodeShareUrl, copyToClipboard } from '../../utils/share';
+import type { ShareMapView } from '../../utils/share';
 
 interface FilterSidebarProps {
   isOpen: boolean;
@@ -10,6 +12,7 @@ interface FilterSidebarProps {
   onClose: () => void;
   onFilterChange: (filters: Partial<FilterOptions>) => void;
   onReset: () => void;
+  mapView: ShareMapView;
 }
 
 const benchTypes: BenchType[] = ['stone', 'wood', 'other'];
@@ -20,7 +23,30 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onClose,
   onFilterChange,
   onReset,
+  mapView,
 }) => {
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const handleGenerateShareLink = () => {
+    const url = encodeShareUrl({
+      filters,
+      mapView,
+    });
+    setShareUrl(url);
+    setShowShareModal(true);
+    setCopied(false);
+  };
+
+  const handleCopyLink = async () => {
+    const success = await copyToClipboard(shareUrl);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   const handleTypeToggle = (type: BenchType) => {
     const currentTypes = filters.benchTypes;
     const newTypes = currentTypes.includes(type)
@@ -205,7 +231,14 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           </div>
         </div>
 
-        <div className="p-5 border-t border-gray-200">
+        <div className="p-5 border-t border-gray-200 space-y-3">
+          <button
+            onClick={handleGenerateShareLink}
+            className="w-full py-3 rounded-xl bg-white border border-emerald-200 text-emerald-700 font-medium hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <Share2 size={18} />
+            生成分享链接
+          </button>
           <button
             onClick={onClose}
             className="w-full py-3 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors"
@@ -214,6 +247,60 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           </button>
         </div>
       </div>
+
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#F8F5F0] rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="p-5 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Share2 size={20} className="text-emerald-600" />
+                  <h3 className="text-lg font-bold text-gray-800">分享筛选结果</h3>
+                </div>
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <p className="text-sm text-gray-600">
+                复制链接包含当前筛选条件和地图位置，分享给好友即可查看相同的结果。
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={shareUrl}
+                  readOnly
+                  className="flex-1 px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-700 outline-none"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className={`px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-1.5 transition-all ${
+                    copied
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  }`}
+                >
+                  {copied ? (
+                    <>
+                      <Check size={16} />
+                      已复制
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={16} />
+                      复制
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

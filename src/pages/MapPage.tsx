@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check, User } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
@@ -9,6 +9,8 @@ import { useBenchStore } from '../store/useBenchStore';
 import { useUserStore } from '../store/useUserStore';
 import { getScoreColor } from '../utils/score';
 import { MessageSquare } from 'lucide-react';
+import { decodeShareUrl, hasShareParams } from '../utils/share';
+import type { ShareMapView } from '../utils/share';
 
 export const MapPage: React.FC = () => {
   const navigate = useNavigate();
@@ -45,7 +47,10 @@ export const MapPage: React.FC = () => {
   const [isLocating, setIsLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
   const [mobileCheckingIn, setMobileCheckingIn] = useState(false);
+  const [mapView, setMapView] = useState<ShareMapView>({ lat: 39.9339, lng: 116.4044, zoom: 12 });
+  const [initializedFromUrl, setInitializedFromUrl] = useState(false);
   const errorTimerRef = React.useRef<number | null>(null);
+  const hasLoadedFromUrlRef = useRef(false);
 
   const clearLocateError = React.useCallback(() => {
     setLocateError(null);
@@ -85,6 +90,38 @@ export const MapPage: React.FC = () => {
     initUser();
   }, [benches.length, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initUser]);
 
+  useEffect(() => {
+    if (hasLoadedFromUrlRef.current) return;
+    if (!hasShareParams()) return;
+    if (benches.length === 0) return;
+
+    const shareState = decodeShareUrl();
+
+    if (shareState.filters) {
+      updateFilters(shareState.filters);
+      if (shareState.filters.searchKeyword) {
+        setSearchValue(shareState.filters.searchKeyword);
+      }
+    }
+
+    if (shareState.mapView) {
+      setMapView(shareState.mapView);
+    }
+
+    if (shareState.benchId) {
+      const bench = benches.find((b) => b.id === shareState.benchId);
+      if (bench) {
+        setSelectedBench(shareState.benchId);
+        if (window.innerWidth < 768) {
+          setShowMobileDetail(true);
+        }
+      }
+    }
+
+    hasLoadedFromUrlRef.current = true;
+    setInitializedFromUrl(true);
+  }, [benches, initBenches, updateFilters, setSelectedBench]);
+
   const filteredBenches = getFilteredBenches();
   const selectedBench = getSelectedBench();
 
@@ -115,6 +152,10 @@ export const MapPage: React.FC = () => {
     setSearchValue(e.target.value);
     updateFilters({ searchKeyword: e.target.value });
     clearLocateError();
+  };
+
+  const handleViewChange = (lat: number, lng: number, zoom: number) => {
+    setMapView({ lat, lng, zoom });
   };
 
   const handleLocate = () => {
@@ -270,8 +311,9 @@ export const MapPage: React.FC = () => {
           benches={filteredBenches}
           selectedBenchId={selectedBenchId}
           onBenchClick={handleBenchClick}
-          center={[39.9339, 116.4044]}
-          zoom={12}
+          onViewChange={handleViewChange}
+          center={[mapView.lat, mapView.lng]}
+          zoom={mapView.zoom}
           userLocation={userLocation}
         />
       </div>
@@ -405,6 +447,7 @@ export const MapPage: React.FC = () => {
         onClose={toggleFilter}
         onFilterChange={updateFilters}
         onReset={resetFilters}
+        mapView={mapView}
       />
 
       <NicknameModal />
