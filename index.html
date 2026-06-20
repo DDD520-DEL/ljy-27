@@ -5,6 +5,26 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>遛弯歇脚地图 - 公园长椅舒适度测评</title>
+    <script>
+      (function () {
+        try {
+          var savedTheme = localStorage.getItem('park_bench_theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.backgroundColor = '#111827';
+            document.documentElement.style.color = '#f3f4f6';
+          } else {
+            document.documentElement.style.backgroundColor = '#ffffff';
+            document.documentElement.style.color = '#111827';
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <style>
+      html, body { margin: 0; padding: 0; transition: background-color 0.3s ease, color 0.3s ease; }
+    </style>
     <script type="module">
       if (import.meta.hot?.on) {
         import.meta.hot.on('vite:error', (error) => {

@@ -75,7 +75,7 @@ export const BenchMarker: React.FC<BenchMarkerProps> = ({
       icon={icon}
       eventHandlers={{ click: onClick }}
     >
-      <Popup>
+      <Popup className="bench-popup">
         <div className="min-w-[200px]">
           {bench.photos[0] && (
             <img
@@ -86,15 +86,15 @@ export const BenchMarker: React.FC<BenchMarkerProps> = ({
           )}
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-gray-800 text-sm">{bench.parkName}</h3>
-              <p className="text-xs text-gray-500 mb-2 truncate">{bench.locationDesc}</p>
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm">{bench.parkName}</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 truncate">{bench.locationDesc}</p>
             </div>
             <button
               onClick={handleFavoriteClick}
               className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                 favorited
-                  ? 'bg-red-100 text-red-500'
-                  : 'bg-gray-100 text-gray-400 hover:text-red-500'
+                  ? 'bg-red-100 dark:bg-red-900/50 text-red-500 dark:text-red-400'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400'
               }`}
             >
               <Heart size={16} fill={favorited ? 'currentColor' : 'none'} />
@@ -107,11 +107,11 @@ export const BenchMarker: React.FC<BenchMarkerProps> = ({
             >
               {bench.overallScore.toFixed(1)} 分
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-400 dark:text-gray-500">
               {bench.checkinCount} 人打卡
             </span>
-            <span className="text-xs text-gray-400 flex items-center gap-1">
-              <MessageSquare size={12} className="text-emerald-600" />
+            <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+              <MessageSquare size={12} className="text-emerald-600 dark:text-emerald-400" />
               {commentCount}
             </span>
           </div>

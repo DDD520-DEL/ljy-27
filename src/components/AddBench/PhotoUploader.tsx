@@ -69,7 +69,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         {photos.map((photo, index) => (
           <div
             key={index}
-            className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group"
+            className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 group"
           >
             <img
               src={photo}
@@ -89,7 +89,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
           <button
             type="button"
             onClick={handleClick}
-            className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-emerald-500 hover:text-emerald-500 transition-colors bg-gray-50"
+            className="aspect-square rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center gap-2 text-gray-400 dark:text-gray-500 hover:border-emerald-500 dark:hover:border-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors bg-gray-50 dark:bg-gray-700/50"
           >
             <Camera size={28} />
             <span className="text-xs font-medium">添加照片</span>
@@ -104,7 +104,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         onChange={handleFileChange}
         className="hidden"
       />
-      <p className="text-xs text-gray-400 mt-2">
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
         最多上传 {maxPhotos} 张照片，点击添加按钮选择图片
       </p>
     </div>
