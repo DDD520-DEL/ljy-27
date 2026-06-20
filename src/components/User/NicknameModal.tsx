@@ -43,7 +43,7 @@ export const NicknameModal: React.FC = () => {
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={closeNicknameModal}
       />
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
+      <div className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up transition-colors duration-300">
         <div className="bg-gradient-to-br from-emerald-500 to-teal-600 px-6 py-8 text-center">
           <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-3">
             <Sparkles size={32} className="text-white" />
@@ -54,7 +54,7 @@ export const NicknameModal: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               选择头像
             </label>
             <div className="grid grid-cols-6 gap-2 mb-3">
@@ -65,8 +65,8 @@ export const NicknameModal: React.FC = () => {
                   onClick={() => setSelectedAvatar(avatar)}
                   className={`w-12 h-12 rounded-xl text-2xl flex items-center justify-center transition-all ${
                     selectedAvatar === avatar
-                      ? 'bg-emerald-100 ring-2 ring-emerald-500 scale-110'
-                      : 'bg-gray-50 hover:bg-gray-100'
+                      ? 'bg-emerald-100 dark:bg-emerald-900/50 ring-2 ring-emerald-500 dark:ring-emerald-400 scale-110'
+                      : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
                   }`}
                 >
                   {avatar}
@@ -76,20 +76,20 @@ export const NicknameModal: React.FC = () => {
             <button
               type="button"
               onClick={handleRandomAvatar}
-              className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+              className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium"
             >
               🎲 随机选一个
             </button>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               昵称
             </label>
             <div className="relative">
               <User
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
               />
               <input
                 type="text"
@@ -100,18 +100,18 @@ export const NicknameModal: React.FC = () => {
                 }}
                 placeholder="给自己起个好听的名字..."
                 maxLength={12}
-                className={`w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border outline-none transition-all text-sm ${
+                className={`w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-700 border outline-none transition-all text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 ${
                   error
-                    ? 'border-red-300 focus:border-red-500 focus:bg-white'
-                    : 'border-transparent focus:border-emerald-300 focus:bg-white'
+                    ? 'border-red-300 dark:border-red-500 focus:border-red-500 dark:focus:border-red-400 focus:bg-white dark:focus:bg-gray-700'
+                    : 'border-transparent focus:border-emerald-300 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-700'
                 }`}
                 autoFocus
               />
             </div>
             {error && (
-              <p className="text-red-500 text-xs mt-1">{error}</p>
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">{error}</p>
             )}
-            <p className="text-gray-400 text-xs mt-1 text-right">
+            <p className="text-gray-400 dark:text-gray-500 text-xs mt-1 text-right">
               {nickname.length}/12
             </p>
           </div>
@@ -119,7 +119,7 @@ export const NicknameModal: React.FC = () => {
           <button
             type="submit"
             disabled={!nickname.trim()}
-            className="w-full py-3 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed shadow-md"
+            className="w-full py-3 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white font-medium hover:bg-emerald-700 dark:hover:bg-emerald-400 transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed shadow-md"
           >
             开始探索
           </button>

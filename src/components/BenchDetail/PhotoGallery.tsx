@@ -30,7 +30,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, parkName, be
 
   if (photos.length === 0) {
     return (
-      <div className="bg-gray-50 rounded-2xl h-48 flex items-center justify-center text-gray-400">
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl h-48 flex items-center justify-center text-gray-400 dark:text-gray-500 transition-colors duration-300">
         暂无照片
       </div>
     );
@@ -59,17 +59,17 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, parkName, be
 
   return (
     <>
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-gray-800">实景照片</h3>
+          <h3 className="font-bold text-gray-800 dark:text-gray-100">实景照片</h3>
           {photos.length > 1 && (
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
               <button
                 onClick={() => setSortMode('time')}
                 className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1 ${
                   sortMode === 'time'
-                    ? 'bg-white text-emerald-700 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white dark:bg-gray-600 text-emerald-700 dark:text-emerald-400 shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                 }`}
               >
                 <ArrowUpDown size={12} />
@@ -79,8 +79,8 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, parkName, be
                 onClick={() => setSortMode('likes')}
                 className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1 ${
                   sortMode === 'likes'
-                    ? 'bg-white text-emerald-700 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white dark:bg-gray-600 text-emerald-700 dark:text-emerald-400 shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                 }`}
               >
                 <ThumbsUp size={12} />

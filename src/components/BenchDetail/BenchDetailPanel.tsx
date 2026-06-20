@@ -107,7 +107,7 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 w-96 bg-[#F8F5F0] shadow-2xl z-40 transform transition-transform duration-300 ease-out ${
+      className={`fixed inset-y-0 left-0 w-96 bg-[#F8F5F0] dark:bg-gray-900 shadow-2xl z-40 transform transition-transform duration-300 ease-out ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
@@ -174,11 +174,11 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
             >
               {getScoreLabel(bench.overallScore)}
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               {checkInCount} 位遛弯族推荐
             </span>
-            <span className="text-sm text-gray-500 flex items-center gap-1">
-              <MessageSquare size={14} className="text-emerald-600" />
+            <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+              <MessageSquare size={14} className="text-emerald-600 dark:text-emerald-500" />
               {commentCount} 条评论
             </span>
           </div>
@@ -186,10 +186,10 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
           <button
             onClick={handleCheckIn}
             disabled={checkingIn}
-            className={`w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all ${
+            className={`w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all transition-colors duration-300 ${
               checkingIn
-                ? 'bg-emerald-100 text-emerald-700 cursor-not-allowed'
-                : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md hover:shadow-lg'
+                ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 cursor-not-allowed'
+                : 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400 shadow-md hover:shadow-lg'
             }`}
           >
             <Check size={18} />
@@ -201,27 +201,27 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
           <PhotoGallery photos={bench.photos} parkName={bench.parkName} benchId={bench.id} />
 
           {bench.note && (
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
               <div className="flex items-center gap-2 mb-2">
-                <MessageSquare size={18} className="text-emerald-600" />
-                <h3 className="font-bold text-gray-800">打卡留言</h3>
+                <MessageSquare size={18} className="text-emerald-600 dark:text-emerald-500" />
+                <h3 className="font-bold text-gray-800 dark:text-gray-100">打卡留言</h3>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed">{bench.note}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{bench.note}</p>
             </div>
           )}
 
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
             <div className="flex items-center gap-2 mb-3">
-              <Navigation size={18} className="text-emerald-600" />
-              <h3 className="font-bold text-gray-800">位置信息</h3>
+              <Navigation size={18} className="text-emerald-600 dark:text-emerald-500" />
+              <h3 className="font-bold text-gray-800 dark:text-gray-100">位置信息</h3>
             </div>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
+            <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300 mb-4">
               <p>
-                <span className="text-gray-400">纬度：</span>
+                <span className="text-gray-400 dark:text-gray-500">纬度：</span>
                 {bench.lat.toFixed(4)}
               </p>
               <p>
-                <span className="text-gray-400">经度：</span>
+                <span className="text-gray-400 dark:text-gray-500">经度：</span>
                 {bench.lng.toFixed(4)}
               </p>
             </div>
@@ -229,7 +229,7 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
             {!showNavOptions ? (
               <button
                 onClick={() => setShowNavOptions(true)}
-                className="w-full py-2.5 rounded-xl bg-emerald-50 text-emerald-700 font-medium text-sm hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-medium text-sm hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors flex items-center justify-center gap-2"
               >
                 <Navigation size={16} />
                 打开地图导航
@@ -238,28 +238,28 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
               <div className="space-y-2">
                 <button
                   onClick={() => handleNavigate('amap')}
-                  className="w-full py-2.5 px-4 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium text-sm hover:border-emerald-400 hover:bg-emerald-50 transition-all flex items-center justify-between"
+                  className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium text-sm hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all flex items-center justify-between"
                 >
                   <span>高德地图导航</span>
-                  <ExternalLink size={14} className="text-gray-400" />
+                  <ExternalLink size={14} className="text-gray-400 dark:text-gray-500" />
                 </button>
                 <button
                   onClick={() => handleNavigate('baidu')}
-                  className="w-full py-2.5 px-4 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium text-sm hover:border-emerald-400 hover:bg-emerald-50 transition-all flex items-center justify-between"
+                  className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium text-sm hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all flex items-center justify-between"
                 >
                   <span>百度地图导航</span>
-                  <ExternalLink size={14} className="text-gray-400" />
+                  <ExternalLink size={14} className="text-gray-400 dark:text-gray-500" />
                 </button>
                 <button
                   onClick={() => handleNavigate('qq')}
-                  className="w-full py-2.5 px-4 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium text-sm hover:border-emerald-400 hover:bg-emerald-50 transition-all flex items-center justify-between"
+                  className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium text-sm hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all flex items-center justify-between"
                 >
                   <span>腾讯地图导航</span>
-                  <ExternalLink size={14} className="text-gray-400" />
+                  <ExternalLink size={14} className="text-gray-400 dark:text-gray-500" />
                 </button>
                 <button
                   onClick={() => setShowNavOptions(false)}
-                  className="w-full py-2 text-gray-400 text-xs hover:text-gray-600 transition-colors"
+                  className="w-full py-2 text-gray-400 dark:text-gray-500 text-xs hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
                 >
                   取消
                 </button>
@@ -267,14 +267,14 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
             )}
           </div>
 
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
             <div className="flex items-center gap-2 mb-3">
-              <Users size={18} className="text-emerald-600" />
-              <h3 className="font-bold text-gray-800">周边长椅</h3>
-              <span className="text-xs text-gray-400 ml-auto">1公里范围内</span>
+              <Users size={18} className="text-emerald-600 dark:text-emerald-500" />
+              <h3 className="font-bold text-gray-800 dark:text-gray-100">周边长椅</h3>
+              <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto">1公里范围内</span>
             </div>
             {nearbyBenches.length === 0 ? (
-              <div className="text-center py-6 text-gray-400 text-sm">
+              <div className="text-center py-6 text-gray-400 dark:text-gray-500 text-sm">
                 暂无周边长椅
               </div>
             ) : (
@@ -283,9 +283,9 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
                   <button
                     key={nearby.id}
                     onClick={() => handleNearbyBenchClick(nearby.id)}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 transition-colors text-left group"
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors text-left group"
                   >
-                    <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {nearby.photos[0] ? (
                         <img
                           src={nearby.photos[0]}
@@ -293,16 +293,16 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <MapPin size={20} className="text-emerald-600" />
+                        <MapPin size={20} className="text-emerald-600 dark:text-emerald-400" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-gray-800 text-sm truncate">
+                        <p className="font-medium text-gray-800 dark:text-gray-200 text-sm truncate">
                           {nearby.parkName}
                         </p>
                       </div>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                         {nearby.locationDesc}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
@@ -317,14 +317,14 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
                           className="text-amber-400"
                           fill="currentColor"
                         />
-                        <span className="text-xs text-emerald-600 font-medium">
+                        <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                           {formatDistance(nearby.distance)}
                         </span>
                       </div>
                     </div>
                     <ChevronRight
                       size={18}
-                      className="text-gray-300 group-hover:text-emerald-500 transition-colors flex-shrink-0"
+                      className="text-gray-300 dark:text-gray-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors flex-shrink-0"
                     />
                   </button>
                 ))}
@@ -338,23 +338,23 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
 
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#F8F5F0] rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="p-5 border-b border-gray-200">
+          <div className="bg-[#F8F5F0] dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md transition-colors duration-300">
+            <div className="p-5 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Share2 size={20} className="text-emerald-600" />
-                  <h3 className="text-lg font-bold text-gray-800">分享长椅</h3>
+                  <Share2 size={20} className="text-emerald-600 dark:text-emerald-500" />
+                  <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">分享长椅</h3>
                 </div>
                 <button
                   onClick={() => setShowShareModal(false)}
-                  className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors"
+                  className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
             </div>
             <div className="p-5 space-y-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 复制链接分享给好友，打开即可查看这个长椅的详情。
               </p>
               <div className="flex gap-2">
@@ -362,14 +362,14 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
                   type="text"
                   value={shareUrl}
                   readOnly
-                  className="flex-1 px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-700 outline-none"
+                  className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors duration-300"
                 />
                 <button
                   onClick={handleCopyLink}
-                  className={`px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-1.5 transition-all ${
+                  className={`px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-1.5 transition-all transition-colors duration-300 ${
                     copied
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                      ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400'
+                      : 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400'
                   }`}
                 >
                   {copied ? (

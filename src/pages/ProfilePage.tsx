@@ -150,16 +150,16 @@ export const ProfilePage: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#F8F5F0] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8F5F0] dark:bg-gray-900 flex items-center justify-center transition-colors duration-300">
         <NicknameModal />
         <div className="text-center">
-          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-            <User size={40} className="text-emerald-600" />
+          <div className="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center mx-auto mb-4">
+            <User size={40} className="text-emerald-600 dark:text-emerald-400" />
           </div>
-          <h3 className="text-lg font-bold text-gray-800 mb-2">请先设置昵称</h3>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">请先设置昵称</h3>
           <button
             onClick={openNicknameModal}
-            className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors"
+            className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 dark:hover:bg-emerald-500 transition-colors"
           >
             设置昵称
           </button>
@@ -169,12 +169,12 @@ export const ProfilePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F5F0]">
+    <div className="min-h-screen bg-[#F8F5F0] dark:bg-gray-900 transition-colors duration-300">
       <NicknameModal />
       <div className="max-w-3xl mx-auto p-4 md:p-6">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition-colors mb-4"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mb-4"
         >
           <ArrowLeft size={20} />
           <span className="font-medium">返回地图</span>
@@ -190,15 +190,15 @@ export const ProfilePage: React.FC = () => {
                 {user.avatar}
               </button>
               {isEditingAvatar && (
-                <div className="absolute top-24 left-0 z-20 bg-white rounded-2xl p-3 shadow-xl grid grid-cols-6 gap-1">
+                <div className="absolute top-24 left-0 z-20 bg-white dark:bg-gray-800 rounded-2xl p-3 shadow-xl grid grid-cols-6 gap-1 transition-colors duration-300">
                   {avatarOptions.map((avatar) => (
                     <button
                       key={avatar}
                       onClick={() => handleSelectAvatar(avatar)}
                       className={`w-10 h-10 rounded-lg text-2xl flex items-center justify-center transition-all ${
                         user.avatar === avatar
-                          ? 'bg-emerald-100 ring-2 ring-emerald-500'
-                          : 'bg-gray-50 hover:bg-gray-100'
+                          ? 'bg-emerald-100 dark:bg-emerald-900/50 ring-2 ring-emerald-500 dark:ring-emerald-400'
+                          : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
                       }`}
                     >
                       {avatar}
@@ -308,14 +308,14 @@ export const ProfilePage: React.FC = () => {
 
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-              <Calendar size={20} className="text-emerald-600" />
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+              <Calendar size={20} className="text-emerald-600 dark:text-emerald-400" />
               最近打卡
             </h2>
             {recentCheckIns.length > 0 && (
               <button
                 onClick={() => navigate('/footprint')}
-                className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium"
               >
                 查看全部 →
               </button>
@@ -323,15 +323,15 @@ export const ProfilePage: React.FC = () => {
           </div>
 
           {recentCheckIns.length === 0 ? (
-            <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-3">
-                <Footprints size={32} className="text-emerald-400" />
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-10 text-center shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-3">
+                <Footprints size={32} className="text-emerald-400 dark:text-emerald-500" />
               </div>
-              <h3 className="font-bold text-gray-800 mb-1">还没有打卡记录</h3>
-              <p className="text-sm text-gray-500 mb-4">快去地图上发现歇脚点吧</p>
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-1">还没有打卡记录</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">快去地图上发现歇脚点吧</p>
               <button
                 onClick={() => navigate('/')}
-                className="px-5 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
+                className="px-5 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 dark:hover:bg-emerald-500 transition-colors"
               >
                 去探索
               </button>
@@ -341,7 +341,7 @@ export const ProfilePage: React.FC = () => {
               {recentCheckIns.map((checkIn, index) => (
                 <div
                   key={checkIn.id}
-                  className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                  className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all"
                 >
                   <div className="flex items-start gap-3">
                     {checkIn.photos[0] && (
@@ -355,14 +355,14 @@ export const ProfilePage: React.FC = () => {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center">
+                            <span className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold flex items-center justify-center">
                               #{index + 1}
                             </span>
-                            <h3 className="font-bold text-gray-800 truncate">
+                            <h3 className="font-bold text-gray-800 dark:text-gray-100 truncate">
                               {checkIn.parkName}
                             </h3>
                           </div>
-                          <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                          <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
                             <MapPin size={12} className="flex-shrink-0" />
                             <span className="truncate">{checkIn.locationDesc}</span>
                           </div>
@@ -380,24 +380,24 @@ export const ProfilePage: React.FC = () => {
                       </div>
 
                       <div className="flex items-center gap-3 mt-2 flex-wrap">
-                        <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 text-xs">
+                        <span className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs">
                           {getBenchTypeLabel(checkIn.benchType)}
                         </span>
-                        <span className="flex items-center gap-0.5 text-xs text-gray-500">
+                        <span className="flex items-center gap-0.5 text-xs text-gray-500 dark:text-gray-400">
                           <Sofa size={10} />
                           {checkIn.comfortScore}
                         </span>
-                        <span className="flex items-center gap-0.5 text-xs text-gray-500">
+                        <span className="flex items-center gap-0.5 text-xs text-gray-500 dark:text-gray-400">
                           <Trees size={10} />
                           {checkIn.shadeScore}
                         </span>
-                        <span className="flex items-center gap-0.5 text-xs text-gray-500">
+                        <span className="flex items-center gap-0.5 text-xs text-gray-500 dark:text-gray-400">
                           <Eye size={10} />
                           {checkIn.viewScore}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
+                      <div className="flex items-center gap-1 mt-2 text-xs text-gray-400 dark:text-gray-500">
                         <Calendar size={10} />
                         <span>{formatDate(checkIn.createdAt)}</span>
                       </div>
@@ -410,45 +410,45 @@ export const ProfilePage: React.FC = () => {
         </div>
 
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
-            <Database size={20} className="text-emerald-600" />
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
+            <Database size={20} className="text-emerald-600 dark:text-emerald-400" />
             数据管理
           </h2>
 
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 transition-colors duration-300">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                <Download size={22} className="text-emerald-600" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+                <Download size={22} className="text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-gray-800">导出数据</h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <h3 className="font-bold text-gray-800 dark:text-gray-100">导出数据</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   将您的签到记录、收藏列表和提交的长椅数据导出为 JSON 文件进行备份
                 </p>
               </div>
               <button
                 onClick={handleExport}
-                className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors flex-shrink-0"
+                className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 dark:hover:bg-emerald-500 transition-colors flex-shrink-0"
               >
                 导出
               </button>
             </div>
 
-            <div className="border-t border-gray-100" />
+            <div className="border-t border-gray-100 dark:border-gray-700" />
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <Upload size={22} className="text-blue-600" />
+              <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                <Upload size={22} className="text-blue-600 dark:text-blue-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-gray-800">导入数据</h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <h3 className="font-bold text-gray-800 dark:text-gray-100">导入数据</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   从 JSON 备份文件恢复数据，系统会自动去重合并，不会覆盖已有数据
                 </p>
               </div>
               <button
                 onClick={handleImportClick}
-                className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors flex-shrink-0"
+                className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors flex-shrink-0"
               >
                 导入
               </button>
@@ -466,99 +466,101 @@ export const ProfilePage: React.FC = () => {
 
       {importResult.show && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-md w-full shadow-2xl transition-colors duration-300">
             <div className="flex items-center gap-3 mb-4">
               <div
                 className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  importResult.success ? 'bg-emerald-100' : 'bg-red-100'
+                  importResult.success
+                    ? 'bg-emerald-100 dark:bg-emerald-900/50'
+                    : 'bg-red-100 dark:bg-red-900/50'
                 }`}
               >
                 {importResult.success ? (
-                  <CheckCircle size={24} className="text-emerald-600" />
+                  <CheckCircle size={24} className="text-emerald-600 dark:text-emerald-400" />
                 ) : (
-                  <AlertCircle size={24} className="text-red-600" />
+                  <AlertCircle size={24} className="text-red-600 dark:text-red-400" />
                 )}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-800">
+                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                   {importResult.success ? '导入成功' : '导入失败'}
                 </h3>
-                <p className="text-sm text-gray-500">{importResult.message}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{importResult.message}</p>
               </div>
             </div>
 
             {importResult.success && importResult.stats && (
-              <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-4 mb-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">新增长椅</span>
-                    <span className="font-medium text-gray-800">
+                    <span className="text-gray-500 dark:text-gray-400">新增长椅</span>
+                    <span className="font-medium text-gray-800 dark:text-gray-100">
                       {importResult.stats.benchesAdded}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">跳过长椅</span>
-                    <span className="font-medium text-gray-400">
+                    <span className="text-gray-500 dark:text-gray-400">跳过长椅</span>
+                    <span className="font-medium text-gray-400 dark:text-gray-500">
                       {importResult.stats.benchesSkipped}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">新增签到</span>
-                    <span className="font-medium text-gray-800">
+                    <span className="text-gray-500 dark:text-gray-400">新增签到</span>
+                    <span className="font-medium text-gray-800 dark:text-gray-100">
                       {importResult.stats.checkInsAdded}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">跳过签到</span>
-                    <span className="font-medium text-gray-400">
+                    <span className="text-gray-500 dark:text-gray-400">跳过签到</span>
+                    <span className="font-medium text-gray-400 dark:text-gray-500">
                       {importResult.stats.checkInsSkipped}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">新增收藏</span>
-                    <span className="font-medium text-gray-800">
+                    <span className="text-gray-500 dark:text-gray-400">新增收藏</span>
+                    <span className="font-medium text-gray-800 dark:text-gray-100">
                       {importResult.stats.favoritesAdded}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">跳过收藏</span>
-                    <span className="font-medium text-gray-400">
+                    <span className="text-gray-500 dark:text-gray-400">跳过收藏</span>
+                    <span className="font-medium text-gray-400 dark:text-gray-500">
                       {importResult.stats.favoritesSkipped}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">新增评论</span>
-                    <span className="font-medium text-gray-800">
+                    <span className="text-gray-500 dark:text-gray-400">新增评论</span>
+                    <span className="font-medium text-gray-800 dark:text-gray-100">
                       {importResult.stats.commentsAdded}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">跳过评论</span>
-                    <span className="font-medium text-gray-400">
+                    <span className="text-gray-500 dark:text-gray-400">跳过评论</span>
+                    <span className="font-medium text-gray-400 dark:text-gray-500">
                       {importResult.stats.commentsSkipped}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">新增举报</span>
-                    <span className="font-medium text-gray-800">
+                    <span className="text-gray-500 dark:text-gray-400">新增举报</span>
+                    <span className="font-medium text-gray-800 dark:text-gray-100">
                       {importResult.stats.reportsAdded}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">跳过举报</span>
-                    <span className="font-medium text-gray-400">
+                    <span className="text-gray-500 dark:text-gray-400">跳过举报</span>
+                    <span className="font-medium text-gray-400 dark:text-gray-500">
                       {importResult.stats.reportsSkipped}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">合并点赞</span>
-                    <span className="font-medium text-gray-800">
+                    <span className="text-gray-500 dark:text-gray-400">合并点赞</span>
+                    <span className="font-medium text-gray-800 dark:text-gray-100">
                       {importResult.stats.photoLikesMerged}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">保持点赞</span>
-                    <span className="font-medium text-gray-400">
+                    <span className="text-gray-500 dark:text-gray-400">保持点赞</span>
+                    <span className="font-medium text-gray-400 dark:text-gray-500">
                       {importResult.stats.photoLikesSkipped}
                     </span>
                   </div>
@@ -570,8 +572,8 @@ export const ProfilePage: React.FC = () => {
               onClick={closeImportResult}
               className={`w-full py-3 rounded-xl font-medium transition-colors ${
                 importResult.success
-                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                  : 'bg-red-600 text-white hover:bg-red-700'
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-700 dark:hover:bg-emerald-500'
+                  : 'bg-red-600 text-white hover:bg-red-700 dark:hover:bg-red-500'
               }`}
             >
               确定

@@ -74,31 +74,31 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
       <button
         type="button"
         onClick={() => navigate('/')}
-        className="flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition-colors"
+        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
       >
         <ArrowLeft size={20} />
         <span className="font-medium">返回地图</span>
       </button>
 
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <MapPin size={18} className="text-emerald-600" />
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+        <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+          <MapPin size={18} className="text-emerald-600 dark:text-emerald-500" />
           位置信息
         </h3>
 
         {selectedLat !== null && selectedLng !== null ? (
-          <div className="mb-4 p-3 bg-emerald-50 rounded-xl text-sm text-emerald-700">
+          <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl text-sm text-emerald-700 dark:text-emerald-400">
             ✓ 已选择位置：{selectedLat.toFixed(4)}, {selectedLng.toFixed(4)}
           </div>
         ) : (
-          <div className="mb-4 p-3 bg-amber-50 rounded-xl text-sm text-amber-700">
+          <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/30 rounded-xl text-sm text-amber-700 dark:text-amber-400">
             请在地图上点击选择长椅位置
           </div>
         )}
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               公园名称 <span className="text-red-500">*</span>
             </label>
             <input
@@ -106,12 +106,12 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
               value={parkName}
               onChange={(e) => setParkName(e.target.value)}
               placeholder="例如：朝阳公园"
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/50 outline-none transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               具体位置 <span className="text-red-500">*</span>
             </label>
             <input
@@ -119,12 +119,12 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
               value={locationDesc}
               onChange={(e) => setLocationDesc(e.target.value)}
               placeholder="例如：南门草坪旁、湖边凉亭下"
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/50 outline-none transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               长椅类型
             </label>
             <div className="flex flex-wrap gap-2">
@@ -135,8 +135,8 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
                   onClick={() => setBenchType(type)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     benchType === type
-                      ? 'bg-emerald-600 text-white shadow-md'
-                      : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-emerald-300'
+                      ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-md'
+                      : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:border-emerald-300 dark:hover:border-emerald-500'
                   }`}
                 >
                   {getBenchTypeLabel(type)}
@@ -147,16 +147,16 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h3 className="font-bold text-gray-800 mb-4">舒适度评分</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+        <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-4">舒适度评分</h3>
         <div className="space-y-5">
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Sofa size={18} className="text-emerald-600" />
-                <span className="font-medium text-gray-700">坐感舒适度</span>
+                <Sofa size={18} className="text-emerald-600 dark:text-emerald-500" />
+                <span className="font-medium text-gray-700 dark:text-gray-300">坐感舒适度</span>
               </div>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {scoreLabels.comfort[comfortScore - 1]}
               </span>
             </div>
@@ -171,10 +171,10 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Trees size={18} className="text-green-500" />
-                <span className="font-medium text-gray-700">遮阴效果</span>
+                <Trees size={18} className="text-green-500 dark:text-green-400" />
+                <span className="font-medium text-gray-700 dark:text-gray-300">遮阴效果</span>
               </div>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {scoreLabels.shade[shadeScore - 1]}
               </span>
             </div>
@@ -189,10 +189,10 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Eye size={18} className="text-amber-500" />
-                <span className="font-medium text-gray-700">视野好坏</span>
+                <Eye size={18} className="text-amber-500 dark:text-amber-400" />
+                <span className="font-medium text-gray-700 dark:text-gray-300">视野好坏</span>
               </div>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {scoreLabels.view[viewScore - 1]}
               </span>
             </div>
@@ -206,29 +206,29 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h3 className="font-bold text-gray-800 mb-4">照片上传</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+        <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-4">照片上传</h3>
         <PhotoUploader photos={photos} onChange={setPhotos} />
       </div>
 
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h3 className="font-bold text-gray-800 mb-3">补充说明</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+        <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-3">补充说明</h3>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="分享一下这个长椅的特别之处吧..."
           rows={3}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all resize-none"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/50 outline-none transition-all resize-none"
         />
       </div>
 
       <button
         type="submit"
         disabled={!canSubmit || submitting}
-        className={`w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 transition-all ${
+        className={`w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 transition-all transition-colors duration-300 ${
           canSubmit && !submitting
-            ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg hover:shadow-xl'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            ? 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400 shadow-lg hover:shadow-xl'
+            : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
         }`}
       >
         <Send size={20} />

@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import type { Bench } from '../../types/bench';
 import { BenchMarker } from './BenchMarker';
+import { useThemeStore } from '../../store/useThemeStore';
 
 interface MapViewProps {
   benches: Bench[];
@@ -84,6 +85,7 @@ export const MapView: React.FC<MapViewProps> = ({
   interactive = true,
   userLocation = null,
 }) => {
+  const { theme } = useThemeStore();
   const selectedBench = benches.find((b) => b.id === selectedBenchId);
   let mapCenter: [number, number] = center;
   if (selectedBench) {
@@ -91,6 +93,14 @@ export const MapView: React.FC<MapViewProps> = ({
   } else if (userLocation) {
     mapCenter = userLocation;
   }
+
+  const tileUrl = theme === 'dark'
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+  const tileAttribution = theme === 'dark'
+    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
   return (
     <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
@@ -102,8 +112,8 @@ export const MapView: React.FC<MapViewProps> = ({
         zoomControl={false}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={tileAttribution}
+          url={tileUrl}
         />
         <MapController center={mapCenter} zoom={selectedBench ? 15 : (userLocation ? 16 : zoom)} />
         <MapViewListener onViewChange={onViewChange} />

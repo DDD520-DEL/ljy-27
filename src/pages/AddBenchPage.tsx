@@ -45,7 +45,7 @@ export const AddBenchPage: React.FC = () => {
       : benches;
 
   return (
-    <div className="min-h-screen bg-[#F8F5F0]">
+    <div className="min-h-screen bg-[#F8F5F0] dark:bg-gray-900 transition-colors duration-300">
       <div className="max-w-7xl mx-auto p-4 md:p-6">
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
@@ -53,8 +53,8 @@ export const AddBenchPage: React.FC = () => {
               <MapPin size={26} className="text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">打卡新长椅</h1>
-              <p className="text-sm text-gray-500">分享你发现的舒适歇脚点</p>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">打卡新长椅</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">分享你发现的舒适歇脚点</p>
             </div>
           </div>
         </div>
@@ -65,12 +65,12 @@ export const AddBenchPage: React.FC = () => {
           </div>
 
           <div className="order-1 md:order-2">
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 sticky top-4">
-              <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <MapPin size={18} className="text-emerald-600" />
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-4 transition-colors duration-300">
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+                <MapPin size={18} className="text-emerald-600 dark:text-emerald-400" />
                 选择位置
               </h3>
-              <p className="text-sm text-gray-500 mb-3">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                 在地图上点击选择长椅的位置
               </p>
               <div className="h-[400px] rounded-xl overflow-hidden">
@@ -87,7 +87,7 @@ export const AddBenchPage: React.FC = () => {
                 />
               </div>
               {selectedLat !== null && selectedLng !== null && (
-                <div className="mt-3 p-3 bg-emerald-50 rounded-xl text-sm text-emerald-700">
+                <div className="mt-3 p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl text-sm text-emerald-700 dark:text-emerald-400">
                   ✓ 已选择位置，继续填写信息吧
                 </div>
               )}

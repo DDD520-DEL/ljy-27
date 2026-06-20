@@ -54,19 +54,19 @@ export const ReportAdminPage: React.FC = () => {
     switch (status) {
       case 'pending':
         return (
-          <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 text-xs font-medium">
+          <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 text-xs font-medium">
             待处理
           </span>
         );
       case 'ignored':
         return (
-          <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 text-xs font-medium">
+          <span className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium">
             已忽略
           </span>
         );
       case 'resolved':
         return (
-          <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-xs font-medium">
+          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
             已处理
           </span>
         );
@@ -104,11 +104,11 @@ export const ReportAdminPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F5F0]">
+    <div className="min-h-screen bg-[#F8F5F0] dark:bg-gray-900 transition-colors duration-300">
       <div className="max-w-4xl mx-auto p-4 md:p-6">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition-colors mb-4"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mb-4"
         >
           <ArrowLeft size={20} />
           <span className="font-medium">返回地图</span>
@@ -150,20 +150,20 @@ export const ReportAdminPage: React.FC = () => {
         <div className="flex gap-2 mb-4">
           <button
             onClick={() => setActiveTab('pending')}
-            className={`px-4 py-2 rounded-xl font-medium text-sm transition-all ${
+            className={`px-4 py-2 rounded-xl font-medium text-sm transition-all transition-colors duration-300 ${
               activeTab === 'pending'
-                ? 'bg-emerald-600 text-white shadow-md'
-                : 'bg-white text-gray-600 hover:bg-gray-50'
+                ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-md'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
             待处理 ({pendingReports.length})
           </button>
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 rounded-xl font-medium text-sm transition-all ${
+            className={`px-4 py-2 rounded-xl font-medium text-sm transition-all transition-colors duration-300 ${
               activeTab === 'all'
-                ? 'bg-emerald-600 text-white shadow-md'
-                : 'bg-white text-gray-600 hover:bg-gray-50'
+                ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-md'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
             全部 ({allReports.length})
@@ -171,14 +171,14 @@ export const ReportAdminPage: React.FC = () => {
         </div>
 
         {displayedReports.length === 0 ? (
-          <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-gray-100">
-            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-3">
-              <AlertTriangle size={32} className="text-emerald-400" />
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-10 text-center shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle size={32} className="text-emerald-400 dark:text-emerald-500" />
             </div>
-            <h3 className="font-bold text-gray-800 mb-1">
+            <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-1">
               {activeTab === 'pending' ? '暂无待处理举报' : '暂无举报记录'}
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {activeTab === 'pending' ? '所有举报已处理完毕' : '还没有用户提交举报'}
             </p>
           </div>
@@ -189,30 +189,30 @@ export const ReportAdminPage: React.FC = () => {
               return (
                 <div
                   key={report.id}
-                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100"
+                  className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300"
                 >
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
                       <div
                         className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                           report.status === 'pending'
-                            ? 'bg-amber-100 text-amber-600'
+                            ? 'bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400'
                             : report.status === 'ignored'
-                            ? 'bg-gray-100 text-gray-500'
-                            : 'bg-emerald-100 text-emerald-600'
+                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                            : 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400'
                         }`}
                       >
                         <Flag size={18} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-bold text-gray-800 truncate">
+                          <h3 className="font-bold text-gray-800 dark:text-gray-100 truncate">
                             {report.benchName}
                           </h3>
                           {getStatusBadge(report.status)}
                         </div>
                         {report.photoIndex !== undefined && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             第 {report.photoIndex + 1} 张照片
                           </span>
                         )}
@@ -221,33 +221,33 @@ export const ReportAdminPage: React.FC = () => {
                   </div>
 
                   <div className="ml-13 space-y-2">
-                    <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 flex-wrap">
                       <span className="flex items-center gap-1">
-                        <AlertTriangle size={14} className="text-red-500" />
+                        <AlertTriangle size={14} className="text-red-500 dark:text-red-400" />
                         {REPORT_REASON_LABELS[report.reason]}
                       </span>
                       <span className="flex items-center gap-1">
-                        <User size={14} />
+                        <User size={14} className="text-gray-500 dark:text-gray-400" />
                         {report.reporter}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Calendar size={14} />
+                        <Calendar size={14} className="text-gray-500 dark:text-gray-400" />
                         {formatDate(report.createdAt)}
                       </span>
                     </div>
 
                     {report.description && (
-                      <p className="text-sm text-gray-600 bg-gray-50 rounded-xl p-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 transition-colors duration-300">
                         {report.description}
                       </p>
                     )}
 
                     {bench && (
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <MapPin size={12} />
                         <span>{bench.locationDesc}</span>
                         {bench.isBanned && (
-                          <span className="px-2 py-0.5 rounded bg-red-100 text-red-600 font-medium">
+                          <span className="px-2 py-0.5 rounded bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 font-medium">
                             已下架
                           </span>
                         )}
@@ -255,7 +255,7 @@ export const ReportAdminPage: React.FC = () => {
                     )}
 
                     {report.handledAt && (
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-gray-400 dark:text-gray-500">
                       处理时间：{formatDate(report.handledAt)} · 处理人：{report.handledBy}
                     </div>
                     )}
@@ -265,7 +265,7 @@ export const ReportAdminPage: React.FC = () => {
                         <button
                           onClick={() => handleIgnore(report.id)}
                           disabled={processingId === report.id}
-                          className="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-medium text-sm hover:bg-gray-200 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                          className="flex-1 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                         >
                           <XCircle size={16} />
                           {processingId === report.id ? '处理中...' : '忽略'}
@@ -273,7 +273,7 @@ export const ReportAdminPage: React.FC = () => {
                         <button
                           onClick={() => handleBan(report.benchId, report.id)}
                           disabled={processingId === report.id}
-                          className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-medium text-sm hover:bg-red-600 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                          className="flex-1 py-2.5 rounded-xl bg-red-500 dark:bg-red-500 text-white font-medium text-sm hover:bg-red-600 dark:hover:bg-red-400 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                         >
                           <Ban size={16} />
                           {processingId === report.id ? '处理中...' : '下架长椅'}
@@ -286,7 +286,7 @@ export const ReportAdminPage: React.FC = () => {
                         <button
                           onClick={() => handleUnban(report.benchId)}
                           disabled={processingId === report.benchId}
-                          className="w-full py-2.5 rounded-xl bg-emerald-50 text-emerald-700 font-medium text-sm hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                          className="w-full py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-medium text-sm hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                         >
                           <UnbanIcon size={16} />
                           {processingId === report.benchId ? '处理中...' : '恢复上架'}
@@ -302,8 +302,8 @@ export const ReportAdminPage: React.FC = () => {
 
         {benches.filter((b) => b.isBanned).length > 0 && (
           <div className="mt-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Ban size={20} className="text-red-500" />
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+              <Ban size={20} className="text-red-500 dark:text-red-400" />
               已下架的长椅
             </h2>
             <div className="space-y-3">
@@ -312,7 +312,7 @@ export const ReportAdminPage: React.FC = () => {
                 .map((bench) => (
                   <div
                     key={bench.id}
-                    className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between gap-4"
+                    className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between gap-4 transition-colors duration-300"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       {bench.photos[0] && (
@@ -323,10 +323,10 @@ export const ReportAdminPage: React.FC = () => {
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-gray-800 truncate">
+                        <h3 className="font-bold text-gray-800 dark:text-gray-100 truncate">
                           {bench.parkName}
                         </h3>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {bench.locationDesc}
                         </p>
                       </div>
@@ -334,7 +334,7 @@ export const ReportAdminPage: React.FC = () => {
                     <button
                       onClick={() => handleUnban(bench.id)}
                       disabled={processingId === bench.id}
-                      className="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 font-medium text-sm hover:bg-emerald-100 transition-colors flex items-center gap-1.5 flex-shrink-0 disabled:opacity-50"
+                      className="px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-medium text-sm hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors flex items-center gap-1.5 flex-shrink-0 disabled:opacity-50"
                     >
                       <Eye size={16} />
                       {processingId === bench.id ? '...' : '恢复'}

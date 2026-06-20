@@ -25,12 +25,12 @@ const ScoreRow: React.FC<ScoreRowProps> = ({ icon, label, score, color }) => (
     </div>
     <div className="flex-1">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
         <span className="text-sm font-bold" style={{ color }}>
           {score.toFixed(1)}
         </span>
       </div>
-      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${(score / 5) * 100}%`, backgroundColor: color }}
@@ -44,7 +44,7 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({ bench }) => {
   const overallColor = getScoreColor(bench.overallScore);
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
       <div className="flex items-center gap-4 mb-5">
         <div
           className="w-20 h-20 rounded-2xl flex flex-col items-center justify-center"
@@ -56,11 +56,11 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({ bench }) => {
           >
             {bench.overallScore.toFixed(1)}
           </span>
-          <span className="text-xs text-gray-500 mt-0.5">综合评分</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">综合评分</span>
         </div>
         <div className="flex-1">
           <RatingStars score={bench.overallScore} size={18} />
-          <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+          <div className="flex items-center gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
               <Users size={12} />
               {bench.checkinCount} 人打卡
@@ -94,9 +94,9 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({ bench }) => {
         />
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-100">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <MapPin size={16} className="text-emerald-600" />
+      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <MapPin size={16} className="text-emerald-600 dark:text-emerald-500" />
           <span className="font-medium">类型：</span>
           <span>{getBenchTypeLabel(bench.benchType)}</span>
         </div>

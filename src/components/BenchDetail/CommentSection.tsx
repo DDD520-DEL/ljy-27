@@ -47,35 +47,35 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, benchId, onReply }) 
   const activeReplies = comment.replies.filter((r) => !r.isDeleted);
 
   return (
-    <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 space-y-3 transition-colors duration-300">
       <div className="flex items-start gap-3">
-        <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-          <User size={18} className="text-emerald-600" />
+        <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0">
+          <User size={18} className="text-emerald-600 dark:text-emerald-400" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-800 text-sm">{comment.author}</span>
-              <span className="text-xs text-gray-400">{formatDate(comment.createdAt)}</span>
+              <span className="font-medium text-gray-800 dark:text-gray-100 text-sm">{comment.author}</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">{formatDate(comment.createdAt)}</span>
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => onReply(comment.id, comment.author)}
-                className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-colors"
                 title="回复"
               >
                 <Reply size={14} />
               </button>
               <button
                 onClick={handleDeleteComment}
-                className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                 title="删除"
               >
                 <Trash2 size={14} />
               </button>
             </div>
           </div>
-          <p className="text-gray-700 text-sm mt-1 leading-relaxed">{comment.content}</p>
+          <p className="text-gray-700 dark:text-gray-300 text-sm mt-1 leading-relaxed">{comment.content}</p>
         </div>
       </div>
 
@@ -95,7 +95,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, benchId, onReply }) 
           )}
           <button
             onClick={() => setShowReplies(!showReplies)}
-            className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+            className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium"
           >
             {showReplies ? '收起回复' : `展开 ${activeReplies.length} 条回复`}
           </button>
@@ -113,41 +113,41 @@ interface ReplyItemProps {
 
 const ReplyItem: React.FC<ReplyItemProps> = ({ reply, onDelete, onReply }) => {
   return (
-    <div className="bg-white rounded-lg p-3 border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-100 dark:border-gray-700 transition-colors duration-300">
       <div className="flex items-start gap-2">
-        <div className="w-7 h-7 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-          <User size={14} className="text-teal-600" />
+        <div className="w-7 h-7 rounded-full bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center flex-shrink-0">
+          <User size={14} className="text-teal-600 dark:text-teal-400" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-gray-800 text-sm">{reply.author}</span>
+              <span className="font-medium text-gray-800 dark:text-gray-100 text-sm">{reply.author}</span>
               {reply.replyTo && (
                 <>
-                  <span className="text-gray-400 text-xs">回复</span>
-                  <span className="text-emerald-600 text-sm font-medium">{reply.replyTo}</span>
+                  <span className="text-gray-400 dark:text-gray-500 text-xs">回复</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">{reply.replyTo}</span>
                 </>
               )}
-              <span className="text-xs text-gray-400">{formatDate(reply.createdAt)}</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">{formatDate(reply.createdAt)}</span>
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={onReply}
-                className="p-1 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
+                className="p-1 text-gray-400 dark:text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded transition-colors"
                 title="回复"
               >
                 <Reply size={12} />
               </button>
               <button
                 onClick={onDelete}
-                className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
                 title="删除"
               >
                 <Trash2 size={12} />
               </button>
             </div>
           </div>
-          <p className="text-gray-700 text-sm mt-1 leading-relaxed">{reply.content}</p>
+          <p className="text-gray-700 dark:text-gray-300 text-sm mt-1 leading-relaxed">{reply.content}</p>
         </div>
       </div>
     </div>
@@ -205,11 +205,11 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ benchId }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
       <div className="flex items-center gap-2 mb-4">
-        <MessageSquare size={18} className="text-emerald-600" />
-        <h3 className="font-bold text-gray-800">评论区</h3>
-        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
+        <MessageSquare size={18} className="text-emerald-600 dark:text-emerald-500" />
+        <h3 className="font-bold text-gray-800 dark:text-gray-100">评论区</h3>
+        <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-medium rounded-full">
           {totalCount}
         </span>
       </div>
@@ -221,7 +221,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ benchId }) => {
             value={authorName}
             onChange={(e) => setAuthorName(e.target.value)}
             placeholder="您的昵称"
-            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-emerald-300 focus:bg-white outline-none transition-all text-sm"
+            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:border-emerald-300 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-700 outline-none transition-all text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
           />
           <div className="relative">
             <textarea
@@ -229,13 +229,13 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ benchId }) => {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="分享您对这个长椅的看法..."
               rows={3}
-              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-emerald-300 focus:bg-white outline-none transition-all text-sm resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:border-emerald-300 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-700 outline-none transition-all text-sm resize-none text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
           <button
             type="submit"
             disabled={!newComment.trim() || !authorName.trim()}
-            className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2.5 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white font-medium text-sm hover:bg-emerald-700 dark:hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send size={16} />
             发表评论
@@ -244,15 +244,15 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ benchId }) => {
       </form>
 
       {replyTo && (
-        <form onSubmit={handleSubmitReply} className="mb-5 p-4 bg-emerald-50 rounded-xl">
+        <form onSubmit={handleSubmitReply} className="mb-5 p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl transition-colors duration-300">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-emerald-700 font-medium">
+            <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
               回复 @{replyTo.author}
             </span>
             <button
               type="button"
               onClick={handleCancelReply}
-              className="text-xs text-gray-500 hover:text-gray-700"
+              className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             >
               取消
             </button>
@@ -263,19 +263,19 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ benchId }) => {
               value={authorName}
               onChange={(e) => setAuthorName(e.target.value)}
               placeholder="您的昵称"
-              className="w-full px-4 py-2.5 rounded-xl bg-white border border-emerald-200 focus:border-emerald-400 outline-none transition-all text-sm"
+              className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-gray-700 border border-emerald-200 dark:border-emerald-800 focus:border-emerald-400 dark:focus:border-emerald-500 outline-none transition-all text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
             />
             <textarea
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
               placeholder={`回复 @${replyTo.author}...`}
               rows={2}
-              className="w-full px-4 py-3 rounded-xl bg-white border border-emerald-200 focus:border-emerald-400 outline-none transition-all text-sm resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-700 border border-emerald-200 dark:border-emerald-800 focus:border-emerald-400 dark:focus:border-emerald-500 outline-none transition-all text-sm resize-none text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
             />
             <button
               type="submit"
               disabled={!replyContent.trim() || !authorName.trim()}
-              className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-2.5 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white font-medium text-sm hover:bg-emerald-700 dark:hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send size={16} />
               发送回复
@@ -287,11 +287,11 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ benchId }) => {
       <div className="space-y-3">
         {benchComments.length === 0 ? (
           <div className="text-center py-10">
-            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
-              <MessageSquare size={28} className="text-gray-400" />
+            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+              <MessageSquare size={28} className="text-gray-400 dark:text-gray-500" />
             </div>
-            <p className="text-gray-500 text-sm">暂无评论</p>
-            <p className="text-gray-400 text-xs mt-1">快来发表第一条评论吧！</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">暂无评论</p>
+            <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">快来发表第一条评论吧！</p>
           </div>
         ) : (
           benchComments.map((comment) => (
