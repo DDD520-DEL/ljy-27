@@ -1,5 +1,13 @@
 export type BenchType = 'stone' | 'wood' | 'other';
 
+export type SortBy =
+  | 'overall'
+  | 'comfort'
+  | 'shade'
+  | 'view'
+  | 'newest'
+  | 'popular';
+
 export interface Bench {
   id: string;
   lat: number;
@@ -25,6 +33,7 @@ export interface FilterOptions {
   searchKeyword: string;
   benchTypes: BenchType[];
   onlyFavorites: boolean;
+  sortBy: SortBy;
 }
 
 export interface NewBenchData {

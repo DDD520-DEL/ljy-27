@@ -48,6 +48,9 @@ export function encodeShareUrl(state: ShareState): string {
     if (f.onlyFavorites) {
       params.set('fav', '1');
     }
+    if (f.sortBy && f.sortBy !== 'overall') {
+      params.set('sort', f.sortBy);
+    }
   }
 
   const baseUrl = `${window.location.origin}${window.location.pathname}`;
@@ -99,6 +102,11 @@ export function decodeShareUrl(): ShareState {
   const fav = params.get('fav');
   if (fav === '1') {
     filters.onlyFavorites = true;
+  }
+
+  const sort = params.get('sort');
+  if (sort) {
+    filters.sortBy = sort as FilterOptions['sortBy'];
   }
 
   if (Object.keys(filters).length > 0) {

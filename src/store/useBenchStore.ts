@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord } from '../types/bench';
+import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord, SortBy } from '../types/bench';
 import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 import { calculateDistance } from '../lib/utils';
@@ -57,6 +57,7 @@ const defaultFilters: FilterOptions = {
   searchKeyword: '',
   benchTypes: [],
   onlyFavorites: false,
+  sortBy: 'overall',
 };
 
 export const useBenchStore = create<BenchState>((set, get) => ({
@@ -181,8 +182,8 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   },
 
   getFilteredBenches: () => {
-    const { benches, filters, favorites } = get();
-    return benches.filter((bench) => {
+    const { benches, filters, favorites, checkIns } = get();
+    const filtered = benches.filter((bench) => {
       if (filters.onlyFavorites && !favorites.includes(bench.id)) return false;
       if (bench.overallScore < filters.minOverallScore) return false;
       if (bench.comfortScore < filters.minComfortScore) return false;
@@ -201,6 +202,38 @@ export const useBenchStore = create<BenchState>((set, get) => ({
       }
       return true;
     });
+
+    const sortBy = filters.sortBy;
+    const sorted = [...filtered];
+
+    switch (sortBy) {
+      case 'overall':
+        sorted.sort((a, b) => b.overallScore - a.overallScore);
+        break;
+      case 'comfort':
+        sorted.sort((a, b) => b.comfortScore - a.comfortScore);
+        break;
+      case 'shade':
+        sorted.sort((a, b) => b.shadeScore - a.shadeScore);
+        break;
+      case 'view':
+        sorted.sort((a, b) => b.viewScore - a.viewScore);
+        break;
+      case 'newest':
+        sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        break;
+      case 'popular':
+        sorted.sort((a, b) => {
+          const aCount = checkIns.filter((c) => c.benchId === a.id).length;
+          const bCount = checkIns.filter((c) => c.benchId === b.id).length;
+          return bCount - aCount;
+        });
+        break;
+      default:
+        break;
+    }
+
+    return sorted;
   },
 
   getSelectedBench: () => {

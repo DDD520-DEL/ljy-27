@@ -61,7 +61,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     filters.minShadeScore > 0 ||
     filters.minViewScore > 0 ||
     filters.benchTypes.length > 0 ||
-    filters.onlyFavorites;
+    filters.onlyFavorites ||
+    filters.sortBy !== 'overall';
 
   return (
     <div

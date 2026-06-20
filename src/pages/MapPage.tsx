@@ -11,8 +11,18 @@ import { getScoreColor } from '../utils/score';
 import { MessageSquare } from 'lucide-react';
 import { decodeShareUrl, hasShareParams } from '../utils/share';
 import type { ShareMapView } from '../utils/share';
+import type { SortBy } from '../types/bench';
 
 const MOBILE_BREAKPOINT = 768;
+
+const SORT_OPTIONS: { key: SortBy; label: string; icon: string }[] = [
+  { key: 'overall', label: '综合评分', icon: '⭐' },
+  { key: 'comfort', label: '舒适度', icon: '🛋️' },
+  { key: 'shade', label: '遮阴度', icon: '🌳' },
+  { key: 'view', label: '视野评分', icon: '🏞️' },
+  { key: 'newest', label: '最新添加', icon: '🆕' },
+  { key: 'popular', label: '打卡热度', icon: '🔥' },
+];
 
 export const MapPage: React.FC = () => {
   const navigate = useNavigate();
@@ -333,12 +343,33 @@ export const MapPage: React.FC = () => {
           </div>
 
           {filteredBenches.length > 0 && (
-            <div className="mt-3 flex items-center gap-2 text-sm text-gray-500 px-1">
-              <span>共找到</span>
-              <span className="font-bold text-emerald-600">
-                {filteredBenches.length}
-              </span>
-              <span>个歇脚点</span>
+            <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-1">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <span>共找到</span>
+                <span className="font-bold text-emerald-600">
+                  {filteredBenches.length}
+                </span>
+                <span>个歇脚点</span>
+              </div>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+                <span className="text-xs text-gray-500 flex-shrink-0">排序：</span>
+                <div className="flex gap-1.5">
+                  {SORT_OPTIONS.map((option) => (
+                    <button
+                      key={option.key}
+                      onClick={() => updateFilters({ sortBy: option.key })}
+                      className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                        filters.sortBy === option.key
+                          ? 'bg-emerald-600 text-white shadow-md'
+                          : 'bg-white/80 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 border border-gray-200'
+                      }`}
+                    >
+                      <span className="text-sm">{option.icon}</span>
+                      <span>{option.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
