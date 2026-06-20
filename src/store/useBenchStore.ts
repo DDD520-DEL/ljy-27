@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord, SortBy, Report, NewReportData } from '../types/bench';
-import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches, loadReports, saveReports, getPendingReports } from '../utils/storage';
+import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches, loadReports, saveReports, getPendingReports, loadPhotoLikes, savePhotoLikes } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 import { calculateDistance } from '../lib/utils';
 
@@ -19,6 +19,7 @@ interface BenchState {
   filters: FilterOptions;
   isFilterOpen: boolean;
   isDetailOpen: boolean;
+  photoLikes: Record<string, number>;
 
   initBenches: () => void;
   initComments: () => void;
@@ -26,9 +27,13 @@ interface BenchState {
   initCheckIns: () => void;
   initContributedBenches: () => void;
   initReports: () => void;
+  initPhotoLikes: () => void;
   setSelectedBench: (id: string | null) => void;
   addBench: (data: NewBenchData) => void;
   addCheckIn: (bench: Bench) => void;
+  togglePhotoLike: (benchId: string, photoIndex: number) => void;
+  getPhotoLikeCount: (benchId: string, photoIndex: number) => number;
+  getMostLikedPhotoIndex: (benchId: string, photoCount: number) => number;
   updateFilters: (filters: Partial<FilterOptions>) => void;
   resetFilters: () => void;
   toggleFilter: () => void;
@@ -81,6 +86,7 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   filters: defaultFilters,
   isFilterOpen: false,
   isDetailOpen: false,
+  photoLikes: {},
 
   initBenches: () => {
     const benches = loadBenches();
@@ -110,6 +116,11 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   initReports: () => {
     const reports = loadReports();
     set({ reports });
+  },
+
+  initPhotoLikes: () => {
+    const photoLikes = loadPhotoLikes();
+    set({ photoLikes });
   },
 
   setSelectedBench: (id) => {
@@ -165,6 +176,36 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     );
     set({ benches });
     saveBenches(benches);
+  },
+
+  togglePhotoLike: (benchId, photoIndex) => {
+    const key = `${benchId}:${photoIndex}`;
+    const { photoLikes } = get();
+    const currentCount = photoLikes[key] || 0;
+    const newPhotoLikes = { ...photoLikes, [key]: currentCount + 1 };
+    set({ photoLikes: newPhotoLikes });
+    savePhotoLikes(newPhotoLikes);
+  },
+
+  getPhotoLikeCount: (benchId, photoIndex) => {
+    const key = `${benchId}:${photoIndex}`;
+    return get().photoLikes[key] || 0;
+  },
+
+  getMostLikedPhotoIndex: (benchId, photoCount) => {
+    if (photoCount === 0) return 0;
+    const { photoLikes } = get();
+    let maxLikes = -1;
+    let maxIndex = 0;
+    for (let i = 0; i < photoCount; i++) {
+      const key = `${benchId}:${i}`;
+      const likes = photoLikes[key] || 0;
+      if (likes > maxLikes) {
+        maxLikes = likes;
+        maxIndex = i;
+      }
+    }
+    return maxIndex;
   },
 
   updateFilters: (filters) => {

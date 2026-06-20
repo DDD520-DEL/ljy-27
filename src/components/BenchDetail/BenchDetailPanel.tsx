@@ -36,11 +36,14 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
     getCheckInCountByBenchId,
     getNearbyBenches,
     setSelectedBench,
+    getMostLikedPhotoIndex,
   } = useBenchStore();
   const commentCount = getCommentCountByBenchId(bench.id);
   const favorited = isFavorite(bench.id);
   const checkInCount = getCheckInCountByBenchId(bench.id);
   const nearbyBenches: NearbyBench[] = getNearbyBenches(bench.id, 1000);
+  const headerPhotoIndex = getMostLikedPhotoIndex(bench.id, bench.photos.length);
+  const headerPhoto = bench.photos[headerPhotoIndex] || bench.photos[0];
 
   const handleFavoriteClick = () => {
     toggleFavorite(bench.id);
@@ -110,9 +113,9 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
     >
       <div className="h-full flex flex-col">
         <div className="relative h-52 flex-shrink-0">
-          {bench.photos[0] ? (
+          {headerPhoto ? (
             <img
-              src={bench.photos[0]}
+              src={headerPhoto}
               alt={bench.parkName}
               className="w-full h-full object-cover"
             />

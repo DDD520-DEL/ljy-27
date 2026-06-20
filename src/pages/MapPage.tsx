@@ -37,6 +37,7 @@ export const MapPage: React.FC = () => {
     initFavorites,
     initCheckIns,
     initContributedBenches,
+    initPhotoLikes,
     setSelectedBench,
     updateFilters,
     resetFilters,
@@ -51,6 +52,7 @@ export const MapPage: React.FC = () => {
     getTotalCheckInCount,
     getCheckInCountByBenchId,
     addCheckIn,
+    getMostLikedPhotoIndex,
   } = useBenchStore();
   const { user, initUser, closeNicknameModal } = useUserStore();
 
@@ -112,8 +114,9 @@ export const MapPage: React.FC = () => {
     initFavorites();
     initCheckIns();
     initContributedBenches();
+    initPhotoLikes();
     initUser();
-  }, [benches.length, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initUser]);
+  }, [benches.length, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initPhotoLikes, initUser]);
 
   const openBenchDetail = useCallback((benchId: string) => {
     setSelectedBench(benchId);
@@ -455,7 +458,7 @@ export const MapPage: React.FC = () => {
                   <div className="flex items-start gap-3 mb-4">
                     {selectedBench.photos[0] && (
                       <img
-                        src={selectedBench.photos[0]}
+                        src={selectedBench.photos[getMostLikedPhotoIndex(selectedBench.id, selectedBench.photos.length)] || selectedBench.photos[0]}
                         alt={selectedBench.parkName}
                         className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
                       />

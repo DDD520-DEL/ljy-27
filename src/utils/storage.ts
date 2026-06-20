@@ -9,6 +9,27 @@ const CHECKINS_STORAGE_KEY = 'park_bench_checkins';
 const USER_STORAGE_KEY = 'park_bench_user';
 const CONTRIBUTED_BENCHES_STORAGE_KEY = 'park_bench_contributed';
 const REPORTS_STORAGE_KEY = 'park_bench_reports';
+const PHOTO_LIKES_STORAGE_KEY = 'park_bench_photo_likes';
+
+export function loadPhotoLikes(): Record<string, number> {
+  try {
+    const stored = localStorage.getItem(PHOTO_LIKES_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load photo likes from storage:', e);
+  }
+  return {};
+}
+
+export function savePhotoLikes(photoLikes: Record<string, number>): void {
+  try {
+    localStorage.setItem(PHOTO_LIKES_STORAGE_KEY, JSON.stringify(photoLikes));
+  } catch (e) {
+    console.error('Failed to save photo likes to storage:', e);
+  }
+}
 
 export function loadBenches(): Bench[] {
   try {
