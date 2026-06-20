@@ -1,5 +1,15 @@
 export type BenchType = 'stone' | 'wood' | 'other';
 
+export type BenchTag = 'reading' | 'daydreaming' | 'dating' | 'pet_friendly' | 'accessible';
+
+export const BENCH_TAG_LABELS: Record<BenchTag, string> = {
+  reading: '适合阅读',
+  daydreaming: '适合发呆',
+  dating: '适合约会',
+  pet_friendly: '宠物友好',
+  accessible: '无障碍可达',
+};
+
 export type SortBy =
   | 'overall'
   | 'comfort'
@@ -15,6 +25,7 @@ export interface Bench {
   parkName: string;
   locationDesc: string;
   benchType: BenchType;
+  tags: BenchTag[];
   comfortScore: number;
   shadeScore: number;
   viewScore: number;
@@ -33,6 +44,7 @@ export interface FilterOptions {
   minViewScore: number;
   searchKeyword: string;
   benchTypes: BenchType[];
+  tags: BenchTag[];
   onlyFavorites: boolean;
   sortBy: SortBy;
 }
@@ -43,6 +55,7 @@ export interface NewBenchData {
   parkName: string;
   locationDesc: string;
   benchType: BenchType;
+  tags: BenchTag[];
   comfortScore: number;
   shadeScore: number;
   viewScore: number;

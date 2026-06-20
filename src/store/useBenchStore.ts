@@ -85,6 +85,7 @@ const defaultFilters: FilterOptions = {
   minViewScore: 0,
   searchKeyword: '',
   benchTypes: [],
+  tags: [],
   onlyFavorites: false,
   sortBy: 'overall',
 };
@@ -293,6 +294,10 @@ export const useBenchStore = create<BenchState>((set, get) => ({
       if (bench.shadeScore < filters.minShadeScore) return false;
       if (bench.viewScore < filters.minViewScore) return false;
       if (filters.benchTypes.length > 0 && !filters.benchTypes.includes(bench.benchType)) return false;
+      if (filters.tags.length > 0) {
+        const hasAllTags = filters.tags.every((tag) => bench.tags.includes(tag));
+        if (!hasAllTags) return false;
+      }
       if (filters.searchKeyword) {
         const keyword = filters.searchKeyword.toLowerCase();
         if (

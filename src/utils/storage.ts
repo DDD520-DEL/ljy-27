@@ -77,7 +77,11 @@ export function loadBenches(): Bench[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const benches = JSON.parse(stored);
+      return benches.map((bench: Bench) => ({
+        ...bench,
+        tags: bench.tags || [],
+      }));
     }
   } catch (e) {
     console.error('Failed to load benches from storage:', e);

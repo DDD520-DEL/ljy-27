@@ -5,6 +5,7 @@ import { PhotoGallery } from './PhotoGallery';
 import { CommentSection } from './CommentSection';
 import { ReportModal } from '../Report/ReportModal';
 import type { Bench } from '../../types/bench';
+import { BENCH_TAG_LABELS } from '../../types/bench';
 import { getScoreColor, getScoreLabel } from '../../utils/score';
 import { useBenchStore, type NearbyBench } from '../../store/useBenchStore';
 import { formatDistance } from '../../lib/utils';
@@ -182,6 +183,19 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
               {commentCount} 条评论
             </span>
           </div>
+
+          {bench.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {bench.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300"
+                >
+                  {BENCH_TAG_LABELS[tag]}
+                </span>
+              ))}
+            </div>
+          )}
 
           <button
             onClick={handleCheckIn}

@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Sofa, Trees, Eye, MapPin, Send, ArrowLeft } from 'lucide-react';
 import { RatingStars } from './RatingStars';
 import { PhotoUploader } from './PhotoUploader';
-import type { BenchType, NewBenchData } from '../../types/bench';
+import type { BenchType, BenchTag, NewBenchData } from '../../types/bench';
+import { BENCH_TAG_LABELS } from '../../types/bench';
 import { useBenchStore } from '../../store/useBenchStore';
 import { getBenchTypeLabel } from '../../utils/score';
 
@@ -13,6 +14,7 @@ interface AddBenchFormProps {
 }
 
 const benchTypes: BenchType[] = ['stone', 'wood', 'other'];
+const benchTags: BenchTag[] = ['reading', 'daydreaming', 'dating', 'pet_friendly', 'accessible'];
 
 const scoreLabels: Record<string, string[]> = {
   comfort: ['硌屁股', '有点硬', '一般', '舒服', '超舒服'],
@@ -30,12 +32,19 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
   const [parkName, setParkName] = useState('');
   const [locationDesc, setLocationDesc] = useState('');
   const [benchType, setBenchType] = useState<BenchType>('stone');
+  const [tags, setTags] = useState<BenchTag[]>([]);
   const [comfortScore, setComfortScore] = useState(3);
   const [shadeScore, setShadeScore] = useState(3);
   const [viewScore, setViewScore] = useState(3);
   const [photos, setPhotos] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  const handleTagToggle = (tag: BenchTag) => {
+    setTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
 
   const canSubmit =
     parkName.trim() !== '' &&
@@ -55,6 +64,7 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
       parkName: parkName.trim(),
       locationDesc: locationDesc.trim(),
       benchType,
+      tags,
       comfortScore,
       shadeScore,
       viewScore,
@@ -142,6 +152,31 @@ export const AddBenchForm: React.FC<AddBenchFormProps> = ({
                   {getBenchTypeLabel(type)}
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              特色标签
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {benchTags.map((tag) => {
+                const isSelected = tags.includes(tag);
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => handleTagToggle(tag)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                      isSelected
+                        ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-md'
+                        : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:border-emerald-300 dark:hover:border-emerald-500'
+                    }`}
+                  >
+                    {BENCH_TAG_LABELS[tag]}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

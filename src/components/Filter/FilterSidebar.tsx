@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Star, Sofa, Trees, Eye, Filter, RotateCcw, Heart, Share2, Copy, Check, BookOpen } from 'lucide-react';
 import { RatingStars } from '../AddBench/RatingStars';
-import type { FilterOptions, BenchType } from '../../types/bench';
+import type { FilterOptions, BenchType, BenchTag } from '../../types/bench';
+import { BENCH_TAG_LABELS } from '../../types/bench';
 import { getBenchTypeLabel } from '../../utils/score';
 import { encodeShareUrl, copyToClipboard } from '../../utils/share';
 import type { ShareMapView } from '../../utils/share';
@@ -17,6 +18,7 @@ interface FilterSidebarProps {
 }
 
 const benchTypes: BenchType[] = ['stone', 'wood', 'other'];
+const benchTags: BenchTag[] = ['reading', 'daydreaming', 'dating', 'pet_friendly', 'accessible'];
 
 export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   isOpen,
@@ -57,12 +59,21 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     onFilterChange({ benchTypes: newTypes });
   };
 
+  const handleTagToggle = (tag: BenchTag) => {
+    const currentTags = filters.tags;
+    const newTags = currentTags.includes(tag)
+      ? currentTags.filter((t) => t !== tag)
+      : [...currentTags, tag];
+    onFilterChange({ tags: newTags });
+  };
+
   const hasActiveFilters =
     filters.minOverallScore > 0 ||
     filters.minComfortScore > 0 ||
     filters.minShadeScore > 0 ||
     filters.minViewScore > 0 ||
     filters.benchTypes.length > 0 ||
+    filters.tags.length > 0 ||
     filters.onlyFavorites ||
     filters.sortBy !== 'overall';
 
@@ -224,6 +235,28 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     }`}
                   >
                     {getBenchTypeLabel(type)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="font-medium text-gray-700 dark:text-gray-200 block mb-3">特色标签</label>
+            <div className="flex flex-wrap gap-2">
+              {benchTags.map((tag) => {
+                const isSelected = filters.tags.includes(tag);
+                return (
+                  <button
+                    key={tag}
+                    onClick={() => handleTagToggle(tag)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                      isSelected
+                        ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-md'
+                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:border-emerald-300 dark:hover:border-emerald-500'
+                    }`}
+                  >
+                    {BENCH_TAG_LABELS[tag]}
                   </button>
                 );
               })}

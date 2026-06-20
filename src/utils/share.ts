@@ -45,6 +45,9 @@ export function encodeShareUrl(state: ShareState): string {
     if (f.benchTypes && f.benchTypes.length > 0) {
       params.set('types', f.benchTypes.join(','));
     }
+    if (f.tags && f.tags.length > 0) {
+      params.set('tags', f.tags.join(','));
+    }
     if (f.onlyFavorites) {
       params.set('fav', '1');
     }
@@ -97,6 +100,11 @@ export function decodeShareUrl(): ShareState {
   const types = params.get('types');
   if (types) {
     filters.benchTypes = types.split(',') as FilterOptions['benchTypes'];
+  }
+
+  const tags = params.get('tags');
+  if (tags) {
+    filters.tags = tags.split(',') as FilterOptions['tags'];
   }
 
   const fav = params.get('fav');
