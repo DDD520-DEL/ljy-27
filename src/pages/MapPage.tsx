@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check, User } from 'lucide-react';
+import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check, User, Info } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
 import { BenchDetailPanel } from '../components/BenchDetail/BenchDetailPanel';
 import { FilterSidebar } from '../components/Filter/FilterSidebar';
@@ -340,6 +340,17 @@ export const MapPage: React.FC = () => {
               ) : (
                 <User size={20} />
               )}
+            </button>
+
+            <button
+              onClick={() => {
+                navigate('/about');
+                clearLocateError();
+              }}
+              className="w-11 h-11 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition-all"
+              title="关于"
+            >
+              <Info size={20} />
             </button>
 
             <button

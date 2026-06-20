@@ -57,6 +57,8 @@ interface BenchState {
   getRecentCheckIns: (limit?: number) => CheckInRecord[];
   getVisibleCheckIns: () => CheckInRecord[];
   getNearbyBenches: (benchId: string, radiusMeters?: number) => NearbyBench[];
+  getBenchCount: () => number;
+  getParkCount: () => number;
   addReport: (data: NewReportData) => void;
   getPendingReports: () => Report[];
   ignoreReport: (reportId: string, handler: string) => void;
@@ -428,6 +430,19 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     const { benches, checkIns } = get();
     const bannedIds = new Set(benches.filter((b) => b.isBanned).map((b) => b.id));
     return checkIns.filter((c) => !bannedIds.has(c.benchId));
+  },
+
+  getBenchCount: () => {
+    const { benches } = get();
+    return benches.filter((b) => !b.isBanned).length;
+  },
+
+  getParkCount: () => {
+    const { benches } = get();
+    const parkNames = new Set(
+      benches.filter((b) => !b.isBanned).map((b) => b.parkName)
+    );
+    return parkNames.size;
   },
 
   getNearbyBenches: (benchId, radiusMeters = 1000) => {
