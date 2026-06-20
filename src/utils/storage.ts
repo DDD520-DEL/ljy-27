@@ -1,10 +1,13 @@
 import type { Bench, Comment, CheckInRecord } from '../types/bench';
+import type { UserProfile } from '../types/user';
 import { mockBenches } from '../data/mockBenches';
 
 const STORAGE_KEY = 'park_bench_data';
 const COMMENTS_STORAGE_KEY = 'park_bench_comments';
 const FAVORITES_STORAGE_KEY = 'park_bench_favorites';
 const CHECKINS_STORAGE_KEY = 'park_bench_checkins';
+const USER_STORAGE_KEY = 'park_bench_user';
+const CONTRIBUTED_BENCHES_STORAGE_KEY = 'park_bench_contributed';
 
 export function loadBenches(): Bench[] {
   try {
@@ -105,4 +108,52 @@ export function saveCheckIns(checkIns: CheckInRecord[]): void {
 export function getCheckInCountByBenchId(benchId: string): number {
   const checkIns = loadCheckIns();
   return checkIns.filter((c) => c.benchId === benchId).length;
+}
+
+export function loadUser(): UserProfile | null {
+  try {
+    const stored = localStorage.getItem(USER_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load user from storage:', e);
+  }
+  return null;
+}
+
+export function saveUser(user: UserProfile): void {
+  try {
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  } catch (e) {
+    console.error('Failed to save user to storage:', e);
+  }
+}
+
+export function clearUser(): void {
+  try {
+    localStorage.removeItem(USER_STORAGE_KEY);
+  } catch (e) {
+    console.error('Failed to clear user from storage:', e);
+  }
+}
+
+export function loadContributedBenches(): string[] {
+  try {
+    const stored = localStorage.getItem(CONTRIBUTED_BENCHES_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load contributed benches from storage:', e);
+  }
+  return [];
+}
+
+export function saveContributedBenches(benchIds: string[]): void {
+  try {
+    localStorage.setItem(CONTRIBUTED_BENCHES_STORAGE_KEY, JSON.stringify(benchIds));
+  } catch (e) {
+    console.error('Failed to save contributed benches to storage:', e);
+  }
 }

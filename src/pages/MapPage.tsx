@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check } from 'lucide-react';
+import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check, User } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
 import { BenchDetailPanel } from '../components/BenchDetail/BenchDetailPanel';
 import { FilterSidebar } from '../components/Filter/FilterSidebar';
+import { NicknameModal } from '../components/User/NicknameModal';
 import { useBenchStore } from '../store/useBenchStore';
+import { useUserStore } from '../store/useUserStore';
 import { getScoreColor } from '../utils/score';
 import { MessageSquare } from 'lucide-react';
 
@@ -20,6 +22,7 @@ export const MapPage: React.FC = () => {
     initComments,
     initFavorites,
     initCheckIns,
+    initContributedBenches,
     setSelectedBench,
     updateFilters,
     resetFilters,
@@ -34,6 +37,7 @@ export const MapPage: React.FC = () => {
     getCheckInCountByBenchId,
     addCheckIn,
   } = useBenchStore();
+  const { user, initUser } = useUserStore();
 
   const [searchValue, setSearchValue] = useState('');
   const [showMobileDetail, setShowMobileDetail] = useState(false);
@@ -77,7 +81,9 @@ export const MapPage: React.FC = () => {
     initComments();
     initFavorites();
     initCheckIns();
-  }, [benches.length, initBenches, initComments, initFavorites, initCheckIns]);
+    initContributedBenches();
+    initUser();
+  }, [benches.length, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initUser]);
 
   const filteredBenches = getFilteredBenches();
   const selectedBench = getSelectedBench();
@@ -213,6 +219,25 @@ export const MapPage: React.FC = () => {
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                   {getTotalCheckInCount()}
                 </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
+                navigate('/profile');
+                clearLocateError();
+              }}
+              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all overflow-hidden ${
+                user
+                  ? 'bg-gradient-to-br from-emerald-100 to-teal-100 hover:from-emerald-200 hover:to-teal-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={user ? user.nickname : '个人中心'}
+            >
+              {user ? (
+                <span className="text-xl">{user.avatar}</span>
+              ) : (
+                <User size={20} />
               )}
             </button>
 
@@ -381,6 +406,8 @@ export const MapPage: React.FC = () => {
         onFilterChange={updateFilters}
         onReset={resetFilters}
       />
+
+      <NicknameModal />
     </div>
   );
 };

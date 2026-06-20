@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord } from '../types/bench';
-import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns } from '../utils/storage';
+import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 import { calculateDistance } from '../lib/utils';
 
@@ -13,6 +13,7 @@ interface BenchState {
   comments: Comment[];
   favorites: string[];
   checkIns: CheckInRecord[];
+  contributedBenchIds: string[];
   selectedBenchId: string | null;
   filters: FilterOptions;
   isFilterOpen: boolean;
@@ -22,6 +23,7 @@ interface BenchState {
   initComments: () => void;
   initFavorites: () => void;
   initCheckIns: () => void;
+  initContributedBenches: () => void;
   setSelectedBench: (id: string | null) => void;
   addBench: (data: NewBenchData) => void;
   addCheckIn: (bench: Bench) => void;
@@ -41,6 +43,9 @@ interface BenchState {
   getCommentCountByBenchId: (benchId: string) => number;
   getCheckInCountByBenchId: (benchId: string) => number;
   getTotalCheckInCount: () => number;
+  getFavoriteCount: () => number;
+  getContributedBenchCount: () => number;
+  getRecentCheckIns: (limit?: number) => CheckInRecord[];
   getNearbyBenches: (benchId: string, radiusMeters?: number) => NearbyBench[];
 }
 
@@ -59,6 +64,7 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   comments: [],
   favorites: [],
   checkIns: [],
+  contributedBenchIds: [],
   selectedBenchId: null,
   filters: defaultFilters,
   isFilterOpen: false,
@@ -84,6 +90,11 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     set({ checkIns });
   },
 
+  initContributedBenches: () => {
+    const contributedBenchIds = loadContributedBenches();
+    set({ contributedBenchIds });
+  },
+
   setSelectedBench: (id) => {
     set({ selectedBenchId: id, isDetailOpen: id !== null });
   },
@@ -104,7 +115,11 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     const benches = [...get().benches, newBench];
     set({ benches });
     saveBenches(benches);
-    
+
+    const contributedBenchIds = [...get().contributedBenchIds, newBench.id];
+    set({ contributedBenchIds });
+    saveContributedBenches(contributedBenchIds);
+
     get().addCheckIn(newBench);
   },
 
@@ -278,6 +293,20 @@ export const useBenchStore = create<BenchState>((set, get) => ({
 
   getTotalCheckInCount: () => {
     return get().checkIns.length;
+  },
+
+  getFavoriteCount: () => {
+    return get().favorites.length;
+  },
+
+  getContributedBenchCount: () => {
+    return get().contributedBenchIds.length;
+  },
+
+  getRecentCheckIns: (limit = 5) => {
+    return [...get().checkIns]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit);
   },
 
   getNearbyBenches: (benchId, radiusMeters = 1000) => {
