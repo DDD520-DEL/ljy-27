@@ -3,6 +3,7 @@ import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewRe
 import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches, loadReports, saveReports, getPendingReports, loadPhotoLikes, savePhotoLikes, exportAllData, downloadExportFile, importData, type ImportResult, loadSearchHistory, addSearchHistory, removeSearchHistory, clearSearchHistory, loadHotSearches, incrementHotSearch, type HotSearchItem } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 import { calculateDistance } from '../lib/utils';
+import { useAchievementStore } from './useAchievementStore';
 
 export interface NearbyBench extends Bench {
   distance: number;
@@ -217,6 +218,8 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     );
     set({ benches });
     saveBenches(benches);
+
+    useAchievementStore.getState().checkAchievements(get().getVisibleCheckIns());
   },
 
   togglePhotoLike: (benchId, photoIndex) => {
@@ -631,6 +634,7 @@ export const useBenchStore = create<BenchState>((set, get) => ({
       get().initContributedBenches();
       get().initReports();
       get().initPhotoLikes();
+      useAchievementStore.getState().initAchievements();
     }
     return result;
   },

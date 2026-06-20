@@ -1,5 +1,6 @@
 import type { Bench, Comment, CheckInRecord, Report } from '../types/bench';
 import type { UserProfile } from '../types/user';
+import type { UnlockedAchievement, AchievementId } from '../types/achievement';
 import { mockBenches } from '../data/mockBenches';
 
 export interface ExportData {
@@ -13,6 +14,7 @@ export interface ExportData {
   comments: Comment[];
   reports: Report[];
   photoLikes: Record<string, number>;
+  achievements: UnlockedAchievement[];
 }
 
 export interface ImportResult {
@@ -31,6 +33,8 @@ export interface ImportResult {
     reportsSkipped: number;
     photoLikesMerged: number;
     photoLikesSkipped: number;
+    achievementsAdded: number;
+    achievementsSkipped: number;
   };
 }
 
@@ -46,6 +50,7 @@ const ONBOARDING_STORAGE_KEY = 'park_bench_onboarding_completed';
 const DAILY_RECOMMEND_STORAGE_KEY = 'park_bench_daily_recommend';
 const SEARCH_HISTORY_STORAGE_KEY = 'park_bench_search_history';
 const HOT_SEARCHES_STORAGE_KEY = 'park_bench_hot_searches';
+const ACHIEVEMENTS_STORAGE_KEY = 'park_bench_achievements';
 const MAX_SEARCH_HISTORY = 10;
 
 export function loadPhotoLikes(): Record<string, number> {
@@ -263,6 +268,7 @@ export function exportAllData(): ExportData {
     comments: loadComments(),
     reports: loadReports(),
     photoLikes: loadPhotoLikes(),
+    achievements: loadAchievements(),
   };
 }
 
@@ -395,6 +401,7 @@ function validateExportData(data: unknown): data is ExportData {
   if (!Array.isArray(d.comments) || !d.comments.every(validateComment)) return false;
   if (!Array.isArray(d.reports) || !d.reports.every(validateReport)) return false;
   if (typeof d.photoLikes !== 'object' || d.photoLikes === null) return false;
+  if (d.achievements !== undefined && (!Array.isArray(d.achievements))) return false;
 
   return true;
 }
@@ -416,6 +423,8 @@ export function importData(jsonString: string): ImportResult {
       reportsSkipped: 0,
       photoLikesMerged: 0,
       photoLikesSkipped: 0,
+      achievementsAdded: 0,
+      achievementsSkipped: 0,
     },
   };
 
@@ -439,6 +448,7 @@ export function importData(jsonString: string): ImportResult {
   const existingReports = loadReports();
   const existingContributed = loadContributedBenches();
   const existingPhotoLikes = loadPhotoLikes();
+  const existingAchievements = loadAchievements();
 
   const existingBenchIds = new Set(existingBenches.map((b) => b.id));
   const existingCheckInIds = new Set(existingCheckIns.map((c) => c.id));
@@ -547,6 +557,22 @@ export function importData(jsonString: string): ImportResult {
     savePhotoLikes(mergedPhotoLikes);
   }
 
+  const existingAchievementIds = new Set(existingAchievements.map((a) => a.id));
+  const mergedAchievements = [...existingAchievements];
+  if (data.achievements && Array.isArray(data.achievements)) {
+    for (const achievement of data.achievements) {
+      if (!existingAchievementIds.has(achievement.id)) {
+        mergedAchievements.push(achievement);
+        result.stats.achievementsAdded++;
+      } else {
+        result.stats.achievementsSkipped++;
+      }
+    }
+  }
+  if (result.stats.achievementsAdded > 0) {
+    saveAchievements(mergedAchievements);
+  }
+
   result.success = true;
   const totalAdded =
     result.stats.benchesAdded +
@@ -554,7 +580,8 @@ export function importData(jsonString: string): ImportResult {
     result.stats.favoritesAdded +
     result.stats.commentsAdded +
     result.stats.reportsAdded +
-    result.stats.photoLikesMerged;
+    result.stats.photoLikesMerged +
+    result.stats.achievementsAdded;
 
   if (totalAdded === 0) {
     result.message = '导入完成，没有新增数据（所有数据已存在）';
@@ -823,4 +850,58 @@ export function getDailyRecommendBenches(allBenches: Bench[]): Bench[] {
   }
 
   return result;
+}
+
+export function loadAchievements(): UnlockedAchievement[] {
+  try {
+    const stored = localStorage.getItem(ACHIEVEMENTS_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load achievements from storage:', e);
+  }
+  return [];
+}
+
+export function saveAchievements(achievements: UnlockedAchievement[]): void {
+  try {
+    localStorage.setItem(ACHIEVEMENTS_STORAGE_KEY, JSON.stringify(achievements));
+  } catch (e) {
+    console.error('Failed to save achievements to storage:', e);
+  }
+}
+
+export function unlockAchievement(id: AchievementId): UnlockedAchievement | null {
+  const achievements = loadAchievements();
+  if (achievements.some((a) => a.id === id)) {
+    return null;
+  }
+  const newAchievement: UnlockedAchievement = {
+    id,
+    unlockedAt: new Date().toISOString(),
+    isNew: true,
+  };
+  achievements.push(newAchievement);
+  saveAchievements(achievements);
+  return newAchievement;
+}
+
+export function markAchievementAsRead(id: AchievementId): void {
+  const achievements = loadAchievements();
+  const updated = achievements.map((a) =>
+    a.id === id ? { ...a, isNew: false } : a
+  );
+  saveAchievements(updated);
+}
+
+export function markAllAchievementsAsRead(): void {
+  const achievements = loadAchievements();
+  const updated = achievements.map((a) => ({ ...a, isNew: false }));
+  saveAchievements(updated);
+}
+
+export function hasNewAchievements(): boolean {
+  const achievements = loadAchievements();
+  return achievements.some((a) => a.isNew);
 }

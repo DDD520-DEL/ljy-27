@@ -21,9 +21,11 @@ import {
   AlertCircle,
   CheckCircle,
   MessageSquare,
+  Award,
 } from 'lucide-react';
 import { useUserStore } from '../store/useUserStore';
 import { useBenchStore } from '../store/useBenchStore';
+import { useAchievementStore } from '../store/useAchievementStore';
 import { getScoreColor, getBenchTypeLabel } from '../utils/score';
 import { NicknameModal } from '../components/User/NicknameModal';
 import type { ImportResult } from '../utils/storage';
@@ -46,6 +48,7 @@ export const ProfilePage: React.FC = () => {
     exportData,
     importData,
   } = useBenchStore();
+  const { initAchievements, getUnlockedCount, getTotalCount, hasNewAchievements } = useAchievementStore();
 
   const [isEditingNickname, setIsEditingNickname] = useState(false);
   const [nicknameInput, setNicknameInput] = useState('');
@@ -64,7 +67,8 @@ export const ProfilePage: React.FC = () => {
     initCheckIns();
     initContributedBenches();
     initReports();
-  }, [initUser, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initReports]);
+    initAchievements();
+  }, [initUser, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initReports, initAchievements]);
 
   const totalCheckIns = getTotalCheckInCount();
   const favoriteCount = getFavoriteCount();
@@ -320,6 +324,29 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
             <ArrowLeft size={20} className="rotate-180" />
+          </button>
+
+          <button
+            onClick={() => navigate('/achievements')}
+            className="w-full mt-3 p-4 rounded-2xl bg-white/15 backdrop-blur-sm hover:bg-white/20 transition-colors flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <Award size={20} />
+              </div>
+              <div className="text-left">
+                <div className="font-medium">成就徽章</div>
+                <div className="text-xs text-emerald-100">
+                  已解锁 {getUnlockedCount()} / {getTotalCount()} 个成就
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasNewAchievements() && (
+                <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
+              )}
+              <ArrowLeft size={20} className="rotate-180" />
+            </div>
           </button>
         </div>
 
@@ -579,6 +606,18 @@ export const ProfilePage: React.FC = () => {
                     <span className="text-gray-500 dark:text-gray-400">保持点赞</span>
                     <span className="font-medium text-gray-400 dark:text-gray-500">
                       {importResult.stats.photoLikesSkipped}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500 dark:text-gray-400">新增成就</span>
+                    <span className="font-medium text-gray-800 dark:text-gray-100">
+                      {importResult.stats.achievementsAdded ?? 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500 dark:text-gray-400">跳过成就</span>
+                    <span className="font-medium text-gray-400 dark:text-gray-500">
+                      {importResult.stats.achievementsSkipped ?? 0}
                     </span>
                   </div>
                 </div>

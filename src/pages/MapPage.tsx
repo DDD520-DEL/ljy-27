@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check, User, Info, Sun, Moon, BarChart3 } from 'lucide-react';
+import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check, User, Info, Sun, Moon, BarChart3, Award, Sparkles } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
 import { BenchDetailPanel } from '../components/BenchDetail/BenchDetailPanel';
 import { FilterSidebar } from '../components/Filter/FilterSidebar';
@@ -8,11 +8,14 @@ import { NicknameModal } from '../components/User/NicknameModal';
 import { useBenchStore } from '../store/useBenchStore';
 import { useUserStore } from '../store/useUserStore';
 import { useThemeStore } from '../store/useThemeStore';
+import { useAchievementStore } from '../store/useAchievementStore';
 import { getScoreColor } from '../utils/score';
 import { MessageSquare } from 'lucide-react';
 import { decodeShareUrl, hasShareParams } from '../utils/share';
 import type { ShareMapView } from '../utils/share';
 import type { SortBy } from '../types/bench';
+import type { AchievementId } from '../types/achievement';
+import { ACHIEVEMENTS } from '../types/achievement';
 import { OnboardingGuide, HelpButton } from '../components/Onboarding/OnboardingGuide';
 import { hasCompletedOnboarding, getDailyRecommendBenches } from '../utils/storage';
 import { DailyRecommend } from '../components/DailyRecommend/DailyRecommend';
@@ -64,6 +67,7 @@ export const MapPage: React.FC = () => {
   } = useBenchStore();
   const { user, initUser, closeNicknameModal } = useUserStore();
   const { theme, toggleTheme } = useThemeStore();
+  const { initAchievements, hasNewAchievements, getUnlockedCount, getTotalCount, newlyUnlocked, clearNewlyUnlocked } = useAchievementStore();
 
   const [searchValue, setSearchValue] = useState('');
   const [showSearchHistory, setShowSearchHistory] = useState(false);
@@ -78,6 +82,7 @@ export const MapPage: React.FC = () => {
   const [showBannedTip, setShowBannedTip] = useState(false);
   const [bannedBenchName, setBannedBenchName] = useState('');
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [achievementToasts, setAchievementToasts] = useState<{ id: string; achievementId: AchievementId }[]>([]);
   const errorTimerRef = React.useRef<number | null>(null);
   const hasLoadedFromUrlRef = useRef(false);
   const pendingShareBenchRef = useRef<string | null>(null);
@@ -130,6 +135,21 @@ export const MapPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (newlyUnlocked.length > 0) {
+      newlyUnlocked.forEach((achievementId, index) => {
+        const toastId = `toast_${achievementId}_${Date.now()}_${index}`;
+        setTimeout(() => {
+          setAchievementToasts((prev) => [...prev, { id: toastId, achievementId }]);
+          setTimeout(() => {
+            setAchievementToasts((prev) => prev.filter((t) => t.id !== toastId));
+          }, 4000);
+        }, index * 500);
+      });
+      clearNewlyUnlocked();
+    }
+  }, [newlyUnlocked, clearNewlyUnlocked]);
+
+  useEffect(() => {
     if (benches.length === 0) {
       initBenches();
     }
@@ -141,7 +161,8 @@ export const MapPage: React.FC = () => {
     initSearchHistory();
     initHotSearches();
     initUser();
-  }, [benches.length, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initPhotoLikes, initSearchHistory, initHotSearches, initUser]);
+    initAchievements();
+  }, [benches.length, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initPhotoLikes, initSearchHistory, initHotSearches, initUser, initAchievements]);
 
   const openBenchDetail = useCallback((benchId: string) => {
     setSelectedBench(benchId);
@@ -372,6 +393,24 @@ export const MapPage: React.FC = () => {
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                   {getTotalCheckInCount()}
                 </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
+                navigate('/achievements');
+                clearLocateError();
+              }}
+              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all relative ${
+                getUnlockedCount() > 0
+                  ? 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800/50'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+              title="成就徽章"
+            >
+              <Award size={20} />
+              {hasNewAchievements() && (
+                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800 animate-pulse" />
               )}
             </button>
 
@@ -666,6 +705,41 @@ export const MapPage: React.FC = () => {
         isOpen={isOnboardingOpen}
         onClose={() => setIsOnboardingOpen(false)}
       />
+
+      <div className="fixed top-24 right-4 z-[70] flex flex-col gap-2 pointer-events-none">
+        {achievementToasts.map((toast) => {
+          const achievement = ACHIEVEMENTS.find((a) => a.id === toast.achievementId);
+          if (!achievement) return null;
+          return (
+            <div
+              key={toast.id}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-4 flex items-center gap-3 min-w-[280px] border border-gray-100 dark:border-gray-700 animate-slide-down transition-colors duration-300 pointer-events-auto"
+              style={{ borderTop: `4px solid ${achievement.color}` }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                style={{ backgroundColor: achievement.bgColor }}
+              >
+                {achievement.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles size={14} style={{ color: achievement.color }} />
+                  <span className="text-xs font-bold" style={{ color: achievement.color }}>
+                    成就解锁！
+                  </span>
+                </div>
+                <h4 className="font-bold text-gray-800 dark:text-gray-100 mt-0.5">
+                  {achievement.title}
+                </h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {achievement.description}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

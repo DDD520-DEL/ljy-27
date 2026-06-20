@@ -9,6 +9,7 @@ import { AboutPage } from '@/pages/AboutPage';
 import { FeedbackPage } from '@/pages/FeedbackPage';
 import { BenchEncyclopediaPage } from '@/pages/BenchEncyclopediaPage';
 import { StatsPage } from '@/pages/StatsPage';
+import { AchievementsPage } from '@/pages/AchievementsPage';
 import { useThemeStore } from '@/store/useThemeStore';
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/add" element={<AddBenchPage />} />
         <Route path="/footprint" element={<FootprintPage />} />
         <Route path="/stats" element={<StatsPage />} />
+        <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
