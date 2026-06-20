@@ -59,6 +59,8 @@ interface BenchState {
   getNearbyBenches: (benchId: string, radiusMeters?: number) => NearbyBench[];
   getBenchCount: () => number;
   getParkCount: () => number;
+  getTotalCheckInDays: () => number;
+  getStreakDays: () => number;
   addReport: (data: NewReportData) => void;
   getPendingReports: () => Report[];
   ignoreReport: (reportId: string, handler: string) => void;
@@ -443,6 +445,52 @@ export const useBenchStore = create<BenchState>((set, get) => ({
       benches.filter((b) => !b.isBanned).map((b) => b.parkName)
     );
     return parkNames.size;
+  },
+
+  getTotalCheckInDays: () => {
+    const { checkIns, benches } = get();
+    const bannedIds = new Set(benches.filter((b) => b.isBanned).map((b) => b.id));
+    const dateSet = new Set(
+      checkIns
+        .filter((c) => !bannedIds.has(c.benchId))
+        .map((c) => {
+          const date = new Date(c.createdAt);
+          return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        })
+    );
+    return dateSet.size;
+  },
+
+  getStreakDays: () => {
+    const { checkIns, benches } = get();
+    const bannedIds = new Set(benches.filter((b) => b.isBanned).map((b) => b.id));
+    const dateSet = new Set(
+      checkIns
+        .filter((c) => !bannedIds.has(c.benchId))
+        .map((c) => {
+          const date = new Date(c.createdAt);
+          return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        })
+    );
+
+    if (dateSet.size === 0) return 0;
+
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let currentDate = new Date(today);
+
+    while (true) {
+      const dateKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${currentDate.getDate()}`;
+      if (dateSet.has(dateKey)) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    return streak;
   },
 
   getNearbyBenches: (benchId, radiusMeters = 1000) => {

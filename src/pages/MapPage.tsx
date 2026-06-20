@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check, User, Info, Sun, Moon } from 'lucide-react';
+import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check, User, Info, Sun, Moon, BarChart3 } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
 import { BenchDetailPanel } from '../components/BenchDetail/BenchDetailPanel';
 import { FilterSidebar } from '../components/Filter/FilterSidebar';
@@ -333,6 +333,7 @@ export const MapPage: React.FC = () => {
                   ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800/50'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
+              title="签到足迹"
             >
               <Footprints size={20} />
               {getTotalCheckInCount() > 0 && (
@@ -340,6 +341,17 @@ export const MapPage: React.FC = () => {
                   {getTotalCheckInCount()}
                 </span>
               )}
+            </button>
+
+            <button
+              onClick={() => {
+                navigate('/stats');
+                clearLocateError();
+              }}
+              className="w-11 h-11 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all"
+              title="数据统计"
+            >
+              <BarChart3 size={20} />
             </button>
 
             <button
