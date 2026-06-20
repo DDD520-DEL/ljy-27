@@ -14,7 +14,8 @@ import { decodeShareUrl, hasShareParams } from '../utils/share';
 import type { ShareMapView } from '../utils/share';
 import type { SortBy } from '../types/bench';
 import { OnboardingGuide, HelpButton } from '../components/Onboarding/OnboardingGuide';
-import { hasCompletedOnboarding } from '../utils/storage';
+import { hasCompletedOnboarding, getDailyRecommendBenches } from '../utils/storage';
+import { DailyRecommend } from '../components/DailyRecommend/DailyRecommend';
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -204,6 +205,7 @@ export const MapPage: React.FC = () => {
 
   const filteredBenches = getFilteredBenches();
   const selectedBench = getSelectedBench();
+  const dailyRecommendBenches = React.useMemo(() => getDailyRecommendBenches(benches), [benches]);
 
   const handleBenchClick = (id: string) => {
     clearLocateError();
@@ -389,6 +391,15 @@ export const MapPage: React.FC = () => {
               <span className="hidden sm:inline">打卡</span>
             </button>
           </div>
+
+          {dailyRecommendBenches.length > 0 && (
+            <div className="mt-3">
+              <DailyRecommend
+                benches={dailyRecommendBenches}
+                onBenchClick={handleBenchClick}
+              />
+            </div>
+          )}
 
           {filteredBenches.length > 0 && (
             <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-1">

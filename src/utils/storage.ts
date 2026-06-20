@@ -43,6 +43,7 @@ const CONTRIBUTED_BENCHES_STORAGE_KEY = 'park_bench_contributed';
 const REPORTS_STORAGE_KEY = 'park_bench_reports';
 const PHOTO_LIKES_STORAGE_KEY = 'park_bench_photo_likes';
 const ONBOARDING_STORAGE_KEY = 'park_bench_onboarding_completed';
+const DAILY_RECOMMEND_STORAGE_KEY = 'park_bench_daily_recommend';
 
 export function loadPhotoLikes(): Record<string, number> {
   try {
@@ -603,4 +604,90 @@ export function resetOnboarding(): void {
   } catch (e) {
     console.error('Failed to reset onboarding status:', e);
   }
+}
+
+interface DailyRecommendData {
+  date: string;
+  benchIds: string[];
+}
+
+function getTodayString(): string {
+  const today = new Date();
+  return `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+}
+
+function seededRandom(seed: number): () => number {
+  return function () {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+}
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+export function getDailyRecommendBenches(allBenches: Bench[]): Bench[] {
+  const today = getTodayString();
+
+  try {
+    const stored = localStorage.getItem(DAILY_RECOMMEND_STORAGE_KEY);
+    if (stored) {
+      const data: DailyRecommendData = JSON.parse(stored);
+      if (data.date === today) {
+        const recommended = data.benchIds
+          .map((id) => allBenches.find((b) => b.id === id && !b.isBanned))
+          .filter((b): b is Bench => b !== undefined);
+        if (recommended.length === 3) {
+          return recommended;
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load daily recommend data:', e);
+  }
+
+  const availableBenches = allBenches.filter((b) => !b.isBanned);
+  if (availableBenches.length <= 3) {
+    const result = availableBenches.slice(0, 3);
+    const data: DailyRecommendData = {
+      date: today,
+      benchIds: result.map((b) => b.id),
+    };
+    try {
+      localStorage.setItem(DAILY_RECOMMEND_STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.error('Failed to save daily recommend data:', e);
+    }
+    return result;
+  }
+
+  const seed = hashString(today);
+  const random = seededRandom(seed);
+
+  const shuffled = [...availableBenches];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  const result = shuffled.slice(0, 3);
+
+  const data: DailyRecommendData = {
+    date: today,
+    benchIds: result.map((b) => b.id),
+  };
+  try {
+    localStorage.setItem(DAILY_RECOMMEND_STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.error('Failed to save daily recommend data:', e);
+  }
+
+  return result;
 }
