@@ -15,6 +15,11 @@ import {
   Check,
   X,
   Flag,
+  Download,
+  Upload,
+  Database,
+  AlertCircle,
+  CheckCircle,
 } from 'lucide-react';
 import { useUserStore } from '../store/useUserStore';
 import { useBenchStore } from '../store/useBenchStore';
@@ -36,12 +41,30 @@ export const ProfilePage: React.FC = () => {
     getContributedBenchCount,
     getRecentCheckIns,
     getPendingReports,
+    exportData,
+    importData,
   } = useBenchStore();
 
   const [isEditingNickname, setIsEditingNickname] = useState(false);
   const [nicknameInput, setNicknameInput] = useState('');
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
+  const [importResult, setImportResult] = useState<{
+    show: boolean;
+    success: boolean;
+    message: string;
+    stats?: {
+      checkInsAdded: number;
+      checkInsSkipped: number;
+      favoritesAdded: number;
+      favoritesSkipped: number;
+      benchesAdded: number;
+      benchesSkipped: number;
+      commentsAdded: number;
+      commentsSkipped: number;
+    };
+  }>({ show: false, success: false, message: '' });
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     initUser();
@@ -96,6 +119,44 @@ export const ProfilePage: React.FC = () => {
   const handleSelectAvatar = (avatar: string) => {
     updateAvatar(avatar);
     setIsEditingAvatar(false);
+  };
+
+  const handleExport = () => {
+    exportData();
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const result = importData(text);
+      setImportResult({
+        show: true,
+        success: result.success,
+        message: result.message,
+        stats: result.stats,
+      });
+    } catch {
+      setImportResult({
+        show: true,
+        success: false,
+        message: '读取文件失败，请重试',
+      });
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const closeImportResult = () => {
+    setImportResult({ show: false, success: false, message: '' });
   };
 
   if (!user) {
@@ -358,7 +419,153 @@ export const ProfilePage: React.FC = () => {
             </div>
           )}
         </div>
+
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
+            <Database size={20} className="text-emerald-600" />
+            数据管理
+          </h2>
+
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                <Download size={22} className="text-emerald-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-gray-800">导出数据</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  将您的签到记录、收藏列表和提交的长椅数据导出为 JSON 文件进行备份
+                </p>
+              </div>
+              <button
+                onClick={handleExport}
+                className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors flex-shrink-0"
+              >
+                导出
+              </button>
+            </div>
+
+            <div className="border-t border-gray-100" />
+
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <Upload size={22} className="text-blue-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-gray-800">导入数据</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  从 JSON 备份文件恢复数据，系统会自动去重合并，不会覆盖已有数据
+                </p>
+              </div>
+              <button
+                onClick={handleImportClick}
+                className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors flex-shrink-0"
+              >
+                导入
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+          </div>
+        </div>
       </div>
+
+      {importResult.show && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  importResult.success ? 'bg-emerald-100' : 'bg-red-100'
+                }`}
+              >
+                {importResult.success ? (
+                  <CheckCircle size={24} className="text-emerald-600" />
+                ) : (
+                  <AlertCircle size={24} className="text-red-600" />
+                )}
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">
+                  {importResult.success ? '导入成功' : '导入失败'}
+                </h3>
+                <p className="text-sm text-gray-500">{importResult.message}</p>
+              </div>
+            </div>
+
+            {importResult.success && importResult.stats && (
+              <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">新增长椅</span>
+                    <span className="font-medium text-gray-800">
+                      {importResult.stats.benchesAdded}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">跳过长椅</span>
+                    <span className="font-medium text-gray-400">
+                      {importResult.stats.benchesSkipped}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">新增签到</span>
+                    <span className="font-medium text-gray-800">
+                      {importResult.stats.checkInsAdded}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">跳过签到</span>
+                    <span className="font-medium text-gray-400">
+                      {importResult.stats.checkInsSkipped}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">新增收藏</span>
+                    <span className="font-medium text-gray-800">
+                      {importResult.stats.favoritesAdded}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">跳过收藏</span>
+                    <span className="font-medium text-gray-400">
+                      {importResult.stats.favoritesSkipped}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">新增评论</span>
+                    <span className="font-medium text-gray-800">
+                      {importResult.stats.commentsAdded}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">跳过评论</span>
+                    <span className="font-medium text-gray-400">
+                      {importResult.stats.commentsSkipped}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={closeImportResult}
+              className={`w-full py-3 rounded-xl font-medium transition-colors ${
+                importResult.success
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  : 'bg-red-600 text-white hover:bg-red-700'
+              }`}
+            >
+              确定
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

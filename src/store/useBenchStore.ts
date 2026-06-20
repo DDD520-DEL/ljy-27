@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord, SortBy, Report, NewReportData } from '../types/bench';
-import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches, loadReports, saveReports, getPendingReports, loadPhotoLikes, savePhotoLikes } from '../utils/storage';
+import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches, loadReports, saveReports, getPendingReports, loadPhotoLikes, savePhotoLikes, exportAllData, downloadExportFile, importData, type ImportResult } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 import { calculateDistance } from '../lib/utils';
 
@@ -62,6 +62,8 @@ interface BenchState {
   ignoreReport: (reportId: string, handler: string) => void;
   banBench: (benchId: string, reportId: string, handler: string) => void;
   unbanBench: (benchId: string) => void;
+  exportData: () => void;
+  importData: (jsonString: string) => ImportResult;
 }
 
 const defaultFilters: FilterOptions = {
@@ -514,5 +516,24 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     });
     set({ benches });
     saveBenches(benches);
+  },
+
+  exportData: () => {
+    const data = exportAllData();
+    downloadExportFile(data);
+  },
+
+  importData: (jsonString) => {
+    const result = importData(jsonString);
+    if (result.success) {
+      get().initBenches();
+      get().initComments();
+      get().initFavorites();
+      get().initCheckIns();
+      get().initContributedBenches();
+      get().initReports();
+      get().initPhotoLikes();
+    }
+    return result;
   },
 }));
