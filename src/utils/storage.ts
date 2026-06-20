@@ -42,6 +42,7 @@ const USER_STORAGE_KEY = 'park_bench_user';
 const CONTRIBUTED_BENCHES_STORAGE_KEY = 'park_bench_contributed';
 const REPORTS_STORAGE_KEY = 'park_bench_reports';
 const PHOTO_LIKES_STORAGE_KEY = 'park_bench_photo_likes';
+const ONBOARDING_STORAGE_KEY = 'park_bench_onboarding_completed';
 
 export function loadPhotoLikes(): Record<string, number> {
   try {
@@ -576,4 +577,30 @@ export function downloadExportFile(data: ExportData): void {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+export function hasCompletedOnboarding(): boolean {
+  try {
+    const stored = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+    return stored === 'true';
+  } catch (e) {
+    console.error('Failed to load onboarding status:', e);
+  }
+  return false;
+}
+
+export function setOnboardingCompleted(): void {
+  try {
+    localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
+  } catch (e) {
+    console.error('Failed to save onboarding status:', e);
+  }
+}
+
+export function resetOnboarding(): void {
+  try {
+    localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+  } catch (e) {
+    console.error('Failed to reset onboarding status:', e);
+  }
 }

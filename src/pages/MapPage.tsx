@@ -13,6 +13,8 @@ import { MessageSquare } from 'lucide-react';
 import { decodeShareUrl, hasShareParams } from '../utils/share';
 import type { ShareMapView } from '../utils/share';
 import type { SortBy } from '../types/bench';
+import { OnboardingGuide, HelpButton } from '../components/Onboarding/OnboardingGuide';
+import { hasCompletedOnboarding } from '../utils/storage';
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -69,9 +71,11 @@ export const MapPage: React.FC = () => {
   const [isSharingLoading, setIsSharingLoading] = useState(false);
   const [showBannedTip, setShowBannedTip] = useState(false);
   const [bannedBenchName, setBannedBenchName] = useState('');
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const errorTimerRef = React.useRef<number | null>(null);
   const hasLoadedFromUrlRef = useRef(false);
   const pendingShareBenchRef = useRef<string | null>(null);
+  const hasCheckedOnboardingRef = useRef(false);
 
   const clearLocateError = React.useCallback(() => {
     setLocateError(null);
@@ -106,6 +110,17 @@ export const MapPage: React.FC = () => {
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (hasCheckedOnboardingRef.current) return;
+    hasCheckedOnboardingRef.current = true;
+    const timer = setTimeout(() => {
+      if (!hasCompletedOnboarding()) {
+        setIsOnboardingOpen(true);
+      }
+    }, 600);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -427,6 +442,7 @@ export const MapPage: React.FC = () => {
             <span>{locateError}</span>
           </div>
         )}
+        <HelpButton onClick={() => setIsOnboardingOpen(true)} />
         <button
           onClick={handleLocate}
           disabled={isLocating}
@@ -590,6 +606,11 @@ export const MapPage: React.FC = () => {
       )}
 
       <NicknameModal />
+
+      <OnboardingGuide
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+      />
     </div>
   );
 };
