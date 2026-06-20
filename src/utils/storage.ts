@@ -671,6 +671,48 @@ export function downloadExportFile(data: ExportData): void {
   URL.revokeObjectURL(url);
 }
 
+const FEEDBACK_STORAGE_KEY = 'park_bench_feedback';
+
+export interface FeedbackItem {
+  id: string;
+  type: 'feature' | 'bug' | 'other';
+  description: string;
+  screenshots: string[];
+  createdAt: string;
+}
+
+export function loadFeedbacks(): FeedbackItem[] {
+  try {
+    const stored = localStorage.getItem(FEEDBACK_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load feedbacks from storage:', e);
+  }
+  return [];
+}
+
+export function saveFeedbacks(feedbacks: FeedbackItem[]): void {
+  try {
+    localStorage.setItem(FEEDBACK_STORAGE_KEY, JSON.stringify(feedbacks));
+  } catch (e) {
+    console.error('Failed to save feedbacks to storage:', e);
+  }
+}
+
+export function addFeedback(item: Omit<FeedbackItem, 'id' | 'createdAt'>): FeedbackItem {
+  const feedbacks = loadFeedbacks();
+  const newItem: FeedbackItem = {
+    ...item,
+    id: `fb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    createdAt: new Date().toISOString(),
+  };
+  feedbacks.unshift(newItem);
+  saveFeedbacks(feedbacks);
+  return newItem;
+}
+
 export function hasCompletedOnboarding(): boolean {
   try {
     const stored = localStorage.getItem(ONBOARDING_STORAGE_KEY);

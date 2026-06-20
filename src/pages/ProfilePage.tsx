@@ -20,6 +20,7 @@ import {
   Database,
   AlertCircle,
   CheckCircle,
+  MessageSquare,
 } from 'lucide-react';
 import { useUserStore } from '../store/useUserStore';
 import { useBenchStore } from '../store/useBenchStore';
@@ -303,6 +304,22 @@ export const ProfilePage: React.FC = () => {
               )}
               <ArrowLeft size={20} className="rotate-180" />
             </div>
+          </button>
+
+          <button
+            onClick={() => navigate('/feedback')}
+            className="w-full mt-3 p-4 rounded-2xl bg-white/15 backdrop-blur-sm hover:bg-white/20 transition-colors flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <MessageSquare size={20} />
+              </div>
+              <div className="text-left">
+                <div className="font-medium">反馈与建议</div>
+                <div className="text-xs text-emerald-100">提交使用建议或问题反馈</div>
+              </div>
+            </div>
+            <ArrowLeft size={20} className="rotate-180" />
           </button>
         </div>
 
