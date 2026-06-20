@@ -23,6 +23,7 @@ export interface Bench {
   note: string;
   createdAt: string;
   checkinCount: number;
+  isBanned: boolean;
 }
 
 export interface FilterOptions {
@@ -96,3 +97,41 @@ export interface CheckInRecord {
   note: string;
   createdAt: string;
 }
+
+export type ReportReason =
+  | 'inappropriate_photo'
+  | 'false_information'
+  | 'duplicate'
+  | 'commercial_spam'
+  | 'other';
+
+export interface Report {
+  id: string;
+  benchId: string;
+  benchName: string;
+  photoIndex?: number;
+  reason: ReportReason;
+  description: string;
+  reporter: string;
+  createdAt: string;
+  status: 'pending' | 'ignored' | 'resolved';
+  handledAt?: string;
+  handledBy?: string;
+}
+
+export interface NewReportData {
+  benchId: string;
+  benchName: string;
+  photoIndex?: number;
+  reason: ReportReason;
+  description: string;
+  reporter: string;
+}
+
+export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
+  inappropriate_photo: '照片不当',
+  false_information: '信息不实',
+  duplicate: '重复提交',
+  commercial_spam: '商业广告',
+  other: '其他原因',
+};

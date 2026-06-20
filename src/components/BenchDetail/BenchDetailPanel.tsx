@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { X, MapPin, Navigation, MessageSquare, ExternalLink, Heart, Check, Users, Star, ChevronRight, Share2, Copy } from 'lucide-react';
+import { X, MapPin, Navigation, MessageSquare, ExternalLink, Heart, Check, Users, Star, ChevronRight, Share2, Copy, Flag } from 'lucide-react';
 import { ScoreCard } from './ScoreCard';
 import { PhotoGallery } from './PhotoGallery';
 import { CommentSection } from './CommentSection';
+import { ReportModal } from '../Report/ReportModal';
 import type { Bench } from '../../types/bench';
 import { getScoreColor, getScoreLabel } from '../../utils/score';
 import { useBenchStore, type NearbyBench } from '../../store/useBenchStore';
@@ -26,6 +27,7 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const {
     getCommentCountByBenchId,
     isFavorite,
@@ -138,6 +140,13 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
               <Heart size={20} fill={favorited ? 'currentColor' : 'none'} />
             </button>
             <button
+              onClick={() => setShowReportModal(true)}
+              className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors"
+              title="举报"
+            >
+              <Flag size={20} />
+            </button>
+            <button
               onClick={onClose}
               className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors"
             >
@@ -186,7 +195,7 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
 
           <ScoreCard bench={bench} />
 
-          <PhotoGallery photos={bench.photos} parkName={bench.parkName} />
+          <PhotoGallery photos={bench.photos} parkName={bench.parkName} benchId={bench.id} />
 
           {bench.note && (
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
@@ -377,6 +386,13 @@ export const BenchDetailPanel: React.FC<BenchDetailPanelProps> = ({
           </div>
         </div>
       )}
+
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        benchId={bench.id}
+        benchName={bench.parkName}
+      />
     </div>
   );
 };

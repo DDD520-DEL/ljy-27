@@ -33,6 +33,7 @@ export const AddBenchPage: React.FC = () => {
             note: '',
             createdAt: '',
             checkinCount: 0,
+            isBanned: false,
           },
         ]
       : benches;

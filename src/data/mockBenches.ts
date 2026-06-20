@@ -29,6 +29,7 @@ export const mockBenches: Bench[] = [
     note: '汉白玉石凳，质感冰凉，夏天坐很舒服。古树遮阴效果好，能看到角楼。',
     createdAt: '2024-03-15T10:30:00Z',
     checkinCount: 128,
+    isBanned: false,
   },
   {
     id: 'bench-002',
@@ -45,6 +46,7 @@ export const mockBenches: Bench[] = [
     note: '百年古木长椅，坐感极佳。长廊遮阴，湖风习习，视野无敌。强烈推荐！',
     createdAt: '2024-02-20T14:20:00Z',
     checkinCount: 256,
+    isBanned: false,
   },
   {
     id: 'bench-003',
@@ -61,6 +63,7 @@ export const mockBenches: Bench[] = [
     note: '石凳比较硌屁股，但古柏遮阴很好。安静清幽，适合歇脚。',
     createdAt: '2024-04-01T09:15:00Z',
     checkinCount: 89,
+    isBanned: false,
   },
   {
     id: 'bench-004',
@@ -77,6 +80,7 @@ export const mockBenches: Bench[] = [
     note: '木质长椅有靠背，比较舒服。周围都是花草，适合发呆。夏天下午会有点晒。',
     createdAt: '2024-05-10T16:45:00Z',
     checkinCount: 67,
+    isBanned: false,
   },
   {
     id: 'bench-005',
@@ -93,6 +97,7 @@ export const mockBenches: Bench[] = [
     note: '水杉林下的木栈道长椅，遮阴100分！夏天比外面低5度。视野一般但很幽静。',
     createdAt: '2024-06-05T11:00:00Z',
     checkinCount: 102,
+    isBanned: false,
   },
   {
     id: 'bench-006',
@@ -109,6 +114,7 @@ export const mockBenches: Bench[] = [
     note: '古柏参天，石凳清凉。能远远看到祈年殿的金顶。适合晨练后休息。',
     createdAt: '2024-03-28T07:30:00Z',
     checkinCount: 145,
+    isBanned: false,
   },
   {
     id: 'bench-007',
@@ -125,6 +131,7 @@ export const mockBenches: Bench[] = [
     note: '景观石改的休息区，不太好坐。但福海景致不错，人少安静。',
     createdAt: '2024-04-22T13:10:00Z',
     checkinCount: 43,
+    isBanned: false,
   },
   {
     id: 'bench-008',
@@ -141,6 +148,7 @@ export const mockBenches: Bench[] = [
     note: '看熊猫累了在这里歇脚最合适。长椅有软垫，坐很久都不累。',
     createdAt: '2024-05-18T10:00:00Z',
     checkinCount: 201,
+    isBanned: false,
   },
   {
     id: 'bench-009',
@@ -157,6 +165,7 @@ export const mockBenches: Bench[] = [
     note: '闹中取静的好地方。湖景很美，周围有芦苇和荷花。下午有点晒建议傍晚来。',
     createdAt: '2024-06-12T18:20:00Z',
     checkinCount: 76,
+    isBanned: false,
   },
   {
     id: 'bench-010',
@@ -173,5 +182,6 @@ export const mockBenches: Bench[] = [
     note: '石林景观很有特色，但石凳硬邦邦的。拍照打卡可以，长时间休息不推荐。',
     createdAt: '2024-04-05T15:40:00Z',
     checkinCount: 54,
+    isBanned: false,
   },
 ];

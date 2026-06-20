@@ -1,4 +1,4 @@
-import type { Bench, Comment, CheckInRecord } from '../types/bench';
+import type { Bench, Comment, CheckInRecord, Report } from '../types/bench';
 import type { UserProfile } from '../types/user';
 import { mockBenches } from '../data/mockBenches';
 
@@ -8,6 +8,7 @@ const FAVORITES_STORAGE_KEY = 'park_bench_favorites';
 const CHECKINS_STORAGE_KEY = 'park_bench_checkins';
 const USER_STORAGE_KEY = 'park_bench_user';
 const CONTRIBUTED_BENCHES_STORAGE_KEY = 'park_bench_contributed';
+const REPORTS_STORAGE_KEY = 'park_bench_reports';
 
 export function loadBenches(): Bench[] {
   try {
@@ -156,4 +157,36 @@ export function saveContributedBenches(benchIds: string[]): void {
   } catch (e) {
     console.error('Failed to save contributed benches to storage:', e);
   }
+}
+
+export function loadReports(): Report[] {
+  try {
+    const stored = localStorage.getItem(REPORTS_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load reports from storage:', e);
+  }
+  return [];
+}
+
+export function saveReports(reports: Report[]): void {
+  try {
+    localStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
+  } catch (e) {
+    console.error('Failed to save reports to storage:', e);
+  }
+}
+
+export function getPendingReports(): Report[] {
+  const reports = loadReports();
+  return reports.filter((r) => r.status === 'pending').sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+}
+
+export function getReportsByBenchId(benchId: string): Report[] {
+  const reports = loadReports();
+  return reports.filter((r) => r.benchId === benchId);
 }

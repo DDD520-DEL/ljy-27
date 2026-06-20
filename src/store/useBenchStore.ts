@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord, SortBy } from '../types/bench';
-import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches } from '../utils/storage';
+import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord, SortBy, Report, NewReportData } from '../types/bench';
+import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches, loadReports, saveReports, getPendingReports } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 import { calculateDistance } from '../lib/utils';
 
@@ -14,6 +14,7 @@ interface BenchState {
   favorites: string[];
   checkIns: CheckInRecord[];
   contributedBenchIds: string[];
+  reports: Report[];
   selectedBenchId: string | null;
   filters: FilterOptions;
   isFilterOpen: boolean;
@@ -24,6 +25,7 @@ interface BenchState {
   initFavorites: () => void;
   initCheckIns: () => void;
   initContributedBenches: () => void;
+  initReports: () => void;
   setSelectedBench: (id: string | null) => void;
   addBench: (data: NewBenchData) => void;
   addCheckIn: (bench: Bench) => void;
@@ -34,6 +36,7 @@ interface BenchState {
   toggleFavorite: (benchId: string) => void;
   isFavorite: (benchId: string) => boolean;
   getFilteredBenches: () => Bench[];
+  getVisibleBenches: () => Bench[];
   getSelectedBench: () => Bench | undefined;
   addComment: (data: NewCommentData) => void;
   addReply: (data: NewReplyData) => void;
@@ -47,6 +50,11 @@ interface BenchState {
   getContributedBenchCount: () => number;
   getRecentCheckIns: (limit?: number) => CheckInRecord[];
   getNearbyBenches: (benchId: string, radiusMeters?: number) => NearbyBench[];
+  addReport: (data: NewReportData) => void;
+  getPendingReports: () => Report[];
+  ignoreReport: (reportId: string, handler: string) => void;
+  banBench: (benchId: string, reportId: string, handler: string) => void;
+  unbanBench: (benchId: string) => void;
 }
 
 const defaultFilters: FilterOptions = {
@@ -66,6 +74,7 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   favorites: [],
   checkIns: [],
   contributedBenchIds: [],
+  reports: [],
   selectedBenchId: null,
   filters: defaultFilters,
   isFilterOpen: false,
@@ -96,6 +105,11 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     set({ contributedBenchIds });
   },
 
+  initReports: () => {
+    const reports = loadReports();
+    set({ reports });
+  },
+
   setSelectedBench: (id) => {
     set({ selectedBenchId: id, isDetailOpen: id !== null });
   },
@@ -112,6 +126,7 @@ export const useBenchStore = create<BenchState>((set, get) => ({
       overallScore,
       createdAt: new Date().toISOString(),
       checkinCount: 1,
+      isBanned: false,
     };
     const benches = [...get().benches, newBench];
     set({ benches });
@@ -184,6 +199,7 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   getFilteredBenches: () => {
     const { benches, filters, favorites, checkIns } = get();
     const filtered = benches.filter((bench) => {
+      if (bench.isBanned) return false;
       if (filters.onlyFavorites && !favorites.includes(bench.id)) return false;
       if (bench.overallScore < filters.minOverallScore) return false;
       if (bench.comfortScore < filters.minComfortScore) return false;
@@ -234,6 +250,11 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     }
 
     return sorted;
+  },
+
+  getVisibleBenches: () => {
+    const { benches } = get();
+    return benches.filter((bench) => !bench.isBanned);
   },
 
   getSelectedBench: () => {
@@ -360,5 +381,73 @@ export const useBenchStore = create<BenchState>((set, get) => ({
       }))
       .filter((b) => b.distance <= radiusMeters)
       .sort((a, b) => a.distance - b.distance);
+  },
+
+  addReport: (data) => {
+    const newReport: Report = {
+      id: generateId(),
+      ...data,
+      createdAt: new Date().toISOString(),
+      status: 'pending',
+    };
+    const reports = [...get().reports, newReport];
+    set({ reports });
+    saveReports(reports);
+  },
+
+  getPendingReports: () => {
+    return getPendingReports();
+  },
+
+  ignoreReport: (reportId, handler) => {
+    const reports = get().reports.map((report) => {
+      if (report.id === reportId) {
+        return {
+          ...report,
+          status: 'ignored' as const,
+          handledAt: new Date().toISOString(),
+          handledBy: handler,
+        };
+      }
+      return report;
+    });
+    set({ reports });
+    saveReports(reports);
+  },
+
+  banBench: (benchId, reportId, handler) => {
+    const benches = get().benches.map((bench) => {
+      if (bench.id === benchId) {
+        return { ...bench, isBanned: true };
+      }
+      return bench;
+    });
+    set({ benches });
+    saveBenches(benches);
+
+    const reports = get().reports.map((report) => {
+      if (report.id === reportId) {
+        return {
+          ...report,
+          status: 'resolved' as const,
+          handledAt: new Date().toISOString(),
+          handledBy: handler,
+        };
+      }
+      return report;
+    });
+    set({ reports });
+    saveReports(reports);
+  },
+
+  unbanBench: (benchId) => {
+    const benches = get().benches.map((bench) => {
+      if (bench.id === benchId) {
+        return { ...bench, isBanned: false };
+      }
+      return bench;
+    });
+    set({ benches });
+    saveBenches(benches);
   },
 }));
