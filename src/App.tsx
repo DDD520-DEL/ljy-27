@@ -6,6 +6,7 @@ import { FootprintPage } from '@/pages/FootprintPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { ReportAdminPage } from '@/pages/ReportAdminPage';
 import { AboutPage } from '@/pages/AboutPage';
+import { BenchEncyclopediaPage } from '@/pages/BenchEncyclopediaPage';
 import { useThemeStore } from '@/store/useThemeStore';
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/footprint" element={<FootprintPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/encyclopedia" element={<BenchEncyclopediaPage />} />
         <Route path="/admin/reports" element={<ReportAdminPage />} />
       </Routes>
     </Router>

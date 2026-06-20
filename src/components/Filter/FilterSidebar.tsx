@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, Star, Sofa, Trees, Eye, Filter, RotateCcw, Heart, Share2, Copy, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, Star, Sofa, Trees, Eye, Filter, RotateCcw, Heart, Share2, Copy, Check, BookOpen } from 'lucide-react';
 import { RatingStars } from '../AddBench/RatingStars';
 import type { FilterOptions, BenchType } from '../../types/bench';
 import { getBenchTypeLabel } from '../../utils/score';
@@ -25,6 +26,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onReset,
   mapView,
 }) => {
+  const navigate = useNavigate();
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
@@ -195,7 +197,19 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           </div>
 
           <div>
-            <label className="font-medium text-gray-700 dark:text-gray-200 block mb-3">长椅类型</label>
+            <div className="flex items-center justify-between mb-3">
+              <label className="font-medium text-gray-700 dark:text-gray-200">长椅类型</label>
+              <button
+                onClick={() => {
+                  onClose();
+                  navigate('/encyclopedia');
+                }}
+                className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium"
+              >
+                <BookOpen size={14} />
+                百科
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {benchTypes.map((type) => {
                 const isSelected = filters.benchTypes.includes(type);
