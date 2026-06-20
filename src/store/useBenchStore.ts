@@ -49,6 +49,7 @@ interface BenchState {
   getFavoriteCount: () => number;
   getContributedBenchCount: () => number;
   getRecentCheckIns: (limit?: number) => CheckInRecord[];
+  getVisibleCheckIns: () => CheckInRecord[];
   getNearbyBenches: (benchId: string, radiusMeters?: number) => NearbyBench[];
   addReport: (data: NewReportData) => void;
   getPendingReports: () => Report[];
@@ -259,7 +260,9 @@ export const useBenchStore = create<BenchState>((set, get) => ({
 
   getSelectedBench: () => {
     const { benches, selectedBenchId } = get();
-    return benches.find((b) => b.id === selectedBenchId);
+    const bench = benches.find((b) => b.id === selectedBenchId);
+    if (bench?.isBanned) return undefined;
+    return bench;
   },
 
   addComment: (data) => {
@@ -346,21 +349,36 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   },
 
   getTotalCheckInCount: () => {
-    return get().checkIns.length;
+    const { benches, checkIns } = get();
+    const bannedIds = new Set(benches.filter((b) => b.isBanned).map((b) => b.id));
+    return checkIns.filter((c) => !bannedIds.has(c.benchId)).length;
   },
 
   getFavoriteCount: () => {
-    return get().favorites.length;
+    const { benches, favorites } = get();
+    const bannedIds = new Set(benches.filter((b) => b.isBanned).map((b) => b.id));
+    return favorites.filter((id) => !bannedIds.has(id)).length;
   },
 
   getContributedBenchCount: () => {
-    return get().contributedBenchIds.length;
+    const { benches, contributedBenchIds } = get();
+    const bannedIds = new Set(benches.filter((b) => b.isBanned).map((b) => b.id));
+    return contributedBenchIds.filter((id) => !bannedIds.has(id)).length;
   },
 
   getRecentCheckIns: (limit = 5) => {
-    return [...get().checkIns]
+    const { benches, checkIns } = get();
+    const bannedIds = new Set(benches.filter((b) => b.isBanned).map((b) => b.id));
+    return [...checkIns]
+      .filter((c) => !bannedIds.has(c.benchId))
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, limit);
+  },
+
+  getVisibleCheckIns: () => {
+    const { benches, checkIns } = get();
+    const bannedIds = new Set(benches.filter((b) => b.isBanned).map((b) => b.id));
+    return checkIns.filter((c) => !bannedIds.has(c.benchId));
   },
 
   getNearbyBenches: (benchId, radiusMeters = 1000) => {
@@ -369,7 +387,7 @@ export const useBenchStore = create<BenchState>((set, get) => ({
     if (!currentBench) return [];
 
     return benches
-      .filter((b) => b.id !== benchId)
+      .filter((b) => b.id !== benchId && !b.isBanned)
       .map((b) => ({
         ...b,
         distance: calculateDistance(

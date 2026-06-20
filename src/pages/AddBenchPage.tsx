@@ -5,9 +5,15 @@ import { AddBenchForm } from '../components/AddBench/AddBenchForm';
 import { useBenchStore } from '../store/useBenchStore';
 
 export const AddBenchPage: React.FC = () => {
-  const benches = useBenchStore((state) => state.benches);
+  const { initBenches, getVisibleBenches } = useBenchStore();
   const [selectedLat, setSelectedLat] = useState<number | null>(null);
   const [selectedLng, setSelectedLng] = useState<number | null>(null);
+
+  useEffect(() => {
+    initBenches();
+  }, [initBenches]);
+
+  const benches = getVisibleBenches();
 
   const handleMapClick = (lat: number, lng: number) => {
     setSelectedLat(lat);

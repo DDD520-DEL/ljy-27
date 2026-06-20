@@ -11,11 +11,14 @@ interface GroupedCheckIns {
 
 export const FootprintPage: React.FC = () => {
   const navigate = useNavigate();
-  const { checkIns, initCheckIns, getTotalCheckInCount } = useBenchStore();
+  const { initBenches, initCheckIns, getTotalCheckInCount, getVisibleCheckIns } = useBenchStore();
 
   useEffect(() => {
+    initBenches();
     initCheckIns();
-  }, [initCheckIns]);
+  }, [initBenches, initCheckIns]);
+
+  const checkIns = getVisibleCheckIns();
 
   const sortedCheckIns = [...checkIns].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
