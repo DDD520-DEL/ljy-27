@@ -16,6 +16,7 @@ import type { SortBy } from '../types/bench';
 import { OnboardingGuide, HelpButton } from '../components/Onboarding/OnboardingGuide';
 import { hasCompletedOnboarding, getDailyRecommendBenches } from '../utils/storage';
 import { DailyRecommend } from '../components/DailyRecommend/DailyRecommend';
+import { SearchHistory } from '../components/Search/SearchHistory';
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -42,6 +43,9 @@ export const MapPage: React.FC = () => {
     initCheckIns,
     initContributedBenches,
     initPhotoLikes,
+    initSearchHistory,
+    initHotSearches,
+    addSearchKeyword,
     setSelectedBench,
     updateFilters,
     resetFilters,
@@ -62,6 +66,7 @@ export const MapPage: React.FC = () => {
   const { theme, toggleTheme } = useThemeStore();
 
   const [searchValue, setSearchValue] = useState('');
+  const [showSearchHistory, setShowSearchHistory] = useState(false);
   const [showMobileDetail, setShowMobileDetail] = useState(false);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
@@ -133,8 +138,10 @@ export const MapPage: React.FC = () => {
     initCheckIns();
     initContributedBenches();
     initPhotoLikes();
+    initSearchHistory();
+    initHotSearches();
     initUser();
-  }, [benches.length, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initPhotoLikes, initUser]);
+  }, [benches.length, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initPhotoLikes, initSearchHistory, initHotSearches, initUser]);
 
   const openBenchDetail = useCallback((benchId: string) => {
     setSelectedBench(benchId);
@@ -233,6 +240,22 @@ export const MapPage: React.FC = () => {
     clearLocateError();
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      addSearchKeyword(searchValue.trim());
+    }
+    setShowSearchHistory(false);
+  };
+
+  const handleKeywordClick = (keyword: string) => {
+    setSearchValue(keyword);
+    updateFilters({ searchKeyword: keyword });
+    addSearchKeyword(keyword);
+    setShowSearchHistory(false);
+    clearLocateError();
+  };
+
   const handleViewChange = (lat: number, lng: number, zoom: number) => {
     setMapView({ lat, lng, zoom });
   };
@@ -296,17 +319,26 @@ export const MapPage: React.FC = () => {
             </div>
 
             <div className="flex-1 relative">
-              <Search
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
-              />
-              <input
-                type="text"
-                value={searchValue}
-                onChange={handleSearch}
-                placeholder="搜索公园或位置..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-transparent dark:border-gray-600/50 focus:border-emerald-300 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-700 outline-none transition-all text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-              />
+              <form onSubmit={handleSearchSubmit}>
+                <Search
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
+                />
+                <input
+                  type="text"
+                  value={searchValue}
+                  onChange={handleSearch}
+                  onFocus={() => setShowSearchHistory(true)}
+                  onBlur={() => setTimeout(() => setShowSearchHistory(false), 200)}
+                  placeholder="搜索公园或位置..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-transparent dark:border-gray-600/50 focus:border-emerald-300 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-700 outline-none transition-all text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                />
+              </form>
+              {showSearchHistory && (
+                <div className="absolute top-full left-0 right-0 z-50">
+                  <SearchHistory onKeywordClick={handleKeywordClick} />
+                </div>
+              )}
             </div>
 
             <button

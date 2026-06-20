@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Bench, FilterOptions, NewBenchData, Comment, NewCommentData, NewReplyData, CheckInRecord, SortBy, Report, NewReportData } from '../types/bench';
-import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches, loadReports, saveReports, getPendingReports, loadPhotoLikes, savePhotoLikes, exportAllData, downloadExportFile, importData, type ImportResult } from '../utils/storage';
+import { loadBenches, saveBenches, loadComments, saveComments, getCommentsByBenchId, getCommentCountByBenchId, loadFavorites, saveFavorites, loadCheckIns, saveCheckIns, loadContributedBenches, saveContributedBenches, loadReports, saveReports, getPendingReports, loadPhotoLikes, savePhotoLikes, exportAllData, downloadExportFile, importData, type ImportResult, loadSearchHistory, addSearchHistory, removeSearchHistory, clearSearchHistory, loadHotSearches, incrementHotSearch, type HotSearchItem } from '../utils/storage';
 import { calculateOverallScore, generateId } from '../utils/score';
 import { calculateDistance } from '../lib/utils';
 
@@ -20,6 +20,8 @@ interface BenchState {
   isFilterOpen: boolean;
   isDetailOpen: boolean;
   photoLikes: Record<string, number>;
+  searchHistory: string[];
+  hotSearches: HotSearchItem[];
 
   initBenches: () => void;
   initComments: () => void;
@@ -68,6 +70,11 @@ interface BenchState {
   unbanBench: (benchId: string) => void;
   exportData: () => void;
   importData: (jsonString: string) => ImportResult;
+  initSearchHistory: () => void;
+  initHotSearches: () => void;
+  addSearchKeyword: (keyword: string) => void;
+  removeSearchKeyword: (keyword: string) => void;
+  clearAllSearchHistory: () => void;
 }
 
 const defaultFilters: FilterOptions = {
@@ -93,6 +100,8 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   isFilterOpen: false,
   isDetailOpen: false,
   photoLikes: {},
+  searchHistory: [],
+  hotSearches: [],
 
   initBenches: () => {
     const benches = loadBenches();
@@ -127,6 +136,32 @@ export const useBenchStore = create<BenchState>((set, get) => ({
   initPhotoLikes: () => {
     const photoLikes = loadPhotoLikes();
     set({ photoLikes });
+  },
+
+  initSearchHistory: () => {
+    const searchHistory = loadSearchHistory();
+    set({ searchHistory });
+  },
+
+  initHotSearches: () => {
+    const hotSearches = loadHotSearches();
+    set({ hotSearches });
+  },
+
+  addSearchKeyword: (keyword) => {
+    const searchHistory = addSearchHistory(keyword);
+    const hotSearches = incrementHotSearch(keyword);
+    set({ searchHistory, hotSearches });
+  },
+
+  removeSearchKeyword: (keyword) => {
+    const searchHistory = removeSearchHistory(keyword);
+    set({ searchHistory });
+  },
+
+  clearAllSearchHistory: () => {
+    const searchHistory = clearSearchHistory();
+    set({ searchHistory });
   },
 
   setSelectedBench: (id) => {

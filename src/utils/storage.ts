@@ -44,6 +44,9 @@ const REPORTS_STORAGE_KEY = 'park_bench_reports';
 const PHOTO_LIKES_STORAGE_KEY = 'park_bench_photo_likes';
 const ONBOARDING_STORAGE_KEY = 'park_bench_onboarding_completed';
 const DAILY_RECOMMEND_STORAGE_KEY = 'park_bench_daily_recommend';
+const SEARCH_HISTORY_STORAGE_KEY = 'park_bench_search_history';
+const HOT_SEARCHES_STORAGE_KEY = 'park_bench_hot_searches';
+const MAX_SEARCH_HISTORY = 10;
 
 export function loadPhotoLikes(): Record<string, number> {
   try {
@@ -560,6 +563,94 @@ export function importData(jsonString: string): ImportResult {
   }
 
   return result;
+}
+
+export function loadSearchHistory(): string[] {
+  try {
+    const stored = localStorage.getItem(SEARCH_HISTORY_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load search history from storage:', e);
+  }
+  return [];
+}
+
+export function saveSearchHistory(history: string[]): void {
+  try {
+    localStorage.setItem(SEARCH_HISTORY_STORAGE_KEY, JSON.stringify(history));
+  } catch (e) {
+    console.error('Failed to save search history to storage:', e);
+  }
+}
+
+export function addSearchHistory(keyword: string): string[] {
+  if (!keyword.trim()) return [];
+  const history = loadSearchHistory();
+  const filtered = history.filter((item) => item.toLowerCase() !== keyword.toLowerCase());
+  const newHistory = [keyword.trim(), ...filtered].slice(0, MAX_SEARCH_HISTORY);
+  saveSearchHistory(newHistory);
+  return newHistory;
+}
+
+export function removeSearchHistory(keyword: string): string[] {
+  const history = loadSearchHistory();
+  const newHistory = history.filter((item) => item !== keyword);
+  saveSearchHistory(newHistory);
+  return newHistory;
+}
+
+export function clearSearchHistory(): string[] {
+  saveSearchHistory([]);
+  return [];
+}
+
+export interface HotSearchItem {
+  keyword: string;
+  count: number;
+}
+
+export function loadHotSearches(): HotSearchItem[] {
+  try {
+    const stored = localStorage.getItem(HOT_SEARCHES_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load hot searches from storage:', e);
+  }
+  return [];
+}
+
+export function saveHotSearches(hotSearches: HotSearchItem[]): void {
+  try {
+    localStorage.setItem(HOT_SEARCHES_STORAGE_KEY, JSON.stringify(hotSearches));
+  } catch (e) {
+    console.error('Failed to save hot searches to storage:', e);
+  }
+}
+
+export function incrementHotSearch(keyword: string): HotSearchItem[] {
+  if (!keyword.trim()) return loadHotSearches();
+  const hotSearches = loadHotSearches();
+  const existingIndex = hotSearches.findIndex(
+    (item) => item.keyword.toLowerCase() === keyword.toLowerCase()
+  );
+  if (existingIndex >= 0) {
+    hotSearches[existingIndex].count += 1;
+  } else {
+    hotSearches.push({ keyword: keyword.trim(), count: 1 });
+  }
+  hotSearches.sort((a, b) => b.count - a.count);
+  const topHotSearches = hotSearches.slice(0, 10);
+  saveHotSearches(topHotSearches);
+  return topHotSearches;
+}
+
+export function getTopHotSearches(limit = 10): HotSearchItem[] {
+  const hotSearches = loadHotSearches();
+  return hotSearches.slice(0, limit);
 }
 
 export function downloadExportFile(data: ExportData): void {
