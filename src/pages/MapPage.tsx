@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Filter, Search, MapPin, Locate, Loader2, AlertCircle, Heart, Footprints, Check, User } from 'lucide-react';
 import { MapView } from '../components/Map/MapView';
@@ -11,6 +11,8 @@ import { getScoreColor } from '../utils/score';
 import { MessageSquare } from 'lucide-react';
 import { decodeShareUrl, hasShareParams } from '../utils/share';
 import type { ShareMapView } from '../utils/share';
+
+const MOBILE_BREAKPOINT = 768;
 
 export const MapPage: React.FC = () => {
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ export const MapPage: React.FC = () => {
     getCheckInCountByBenchId,
     addCheckIn,
   } = useBenchStore();
-  const { user, initUser } = useUserStore();
+  const { user, initUser, closeNicknameModal } = useUserStore();
 
   const [searchValue, setSearchValue] = useState('');
   const [showMobileDetail, setShowMobileDetail] = useState(false);
@@ -48,9 +50,11 @@ export const MapPage: React.FC = () => {
   const [locateError, setLocateError] = useState<string | null>(null);
   const [mobileCheckingIn, setMobileCheckingIn] = useState(false);
   const [mapView, setMapView] = useState<ShareMapView>({ lat: 39.9339, lng: 116.4044, zoom: 12 });
-  const [initializedFromUrl, setInitializedFromUrl] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < MOBILE_BREAKPOINT);
+  const [isSharingLoading, setIsSharingLoading] = useState(false);
   const errorTimerRef = React.useRef<number | null>(null);
   const hasLoadedFromUrlRef = useRef(false);
+  const pendingShareBenchRef = useRef<string | null>(null);
 
   const clearLocateError = React.useCallback(() => {
     setLocateError(null);
@@ -80,6 +84,14 @@ export const MapPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     if (benches.length === 0) {
       initBenches();
     }
@@ -89,6 +101,13 @@ export const MapPage: React.FC = () => {
     initContributedBenches();
     initUser();
   }, [benches.length, initBenches, initComments, initFavorites, initCheckIns, initContributedBenches, initUser]);
+
+  const openBenchDetail = useCallback((benchId: string) => {
+    setSelectedBench(benchId);
+    if (window.innerWidth < MOBILE_BREAKPOINT) {
+      setShowMobileDetail(true);
+    }
+  }, [setSelectedBench]);
 
   useEffect(() => {
     if (hasLoadedFromUrlRef.current) return;
@@ -111,27 +130,46 @@ export const MapPage: React.FC = () => {
     if (shareState.benchId) {
       const bench = benches.find((b) => b.id === shareState.benchId);
       if (bench) {
-        setSelectedBench(shareState.benchId);
-        if (window.innerWidth < 768) {
-          setShowMobileDetail(true);
-        }
+        closeNicknameModal();
+        setIsSharingLoading(true);
+        pendingShareBenchRef.current = shareState.benchId;
       }
     }
 
     hasLoadedFromUrlRef.current = true;
-    setInitializedFromUrl(true);
-  }, [benches, initBenches, updateFilters, setSelectedBench]);
+  }, [benches, updateFilters, closeNicknameModal]);
+
+  useEffect(() => {
+    if (pendingShareBenchRef.current) {
+      const benchId = pendingShareBenchRef.current;
+      const bench = benches.find((b) => b.id === benchId);
+      if (bench) {
+        const timer = setTimeout(() => {
+          openBenchDetail(benchId);
+          setIsSharingLoading(false);
+          pendingShareBenchRef.current = null;
+        }, 400);
+        return () => clearTimeout(timer);
+      } else {
+        pendingShareBenchRef.current = null;
+        setIsSharingLoading(false);
+      }
+    }
+  }, [benches, mapView, openBenchDetail]);
+
+  useEffect(() => {
+    if (selectedBenchId && isMobile && !showMobileDetail) {
+      setShowMobileDetail(true);
+    }
+  }, [selectedBenchId, isMobile, showMobileDetail]);
 
   const filteredBenches = getFilteredBenches();
   const selectedBench = getSelectedBench();
 
   const handleBenchClick = (id: string) => {
-    setSelectedBench(id);
     clearLocateError();
     setUserLocation(null);
-    if (window.innerWidth < 768) {
-      setShowMobileDetail(true);
-    }
+    openBenchDetail(id);
   };
 
   const handleCloseDetail = () => {
@@ -344,10 +382,19 @@ export const MapPage: React.FC = () => {
         </button>
       </div>
 
+      {isSharingLoading && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl px-8 py-6 flex flex-col items-center gap-3">
+            <Loader2 size={32} className="text-emerald-600 animate-spin" />
+            <p className="text-gray-700 font-medium">正在加载分享内容...</p>
+          </div>
+        </div>
+      )}
+
       {selectedBench && (
         <BenchDetailPanel
           bench={selectedBench}
-          isOpen={isDetailOpen && window.innerWidth >= 768}
+          isOpen={isDetailOpen && !isMobile}
           onClose={handleCloseDetail}
         />
       )}
