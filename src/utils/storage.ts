@@ -27,6 +27,10 @@ export interface ImportResult {
     benchesSkipped: number;
     commentsAdded: number;
     commentsSkipped: number;
+    reportsAdded: number;
+    reportsSkipped: number;
+    photoLikesMerged: number;
+    photoLikesSkipped: number;
   };
 }
 
@@ -334,6 +338,36 @@ function validateComment(comment: unknown): comment is Comment {
   );
 }
 
+function validateReport(report: unknown): report is Report {
+  if (typeof report !== 'object' || report === null) return false;
+  const r = report as Record<string, unknown>;
+  const validStatuses = ['pending', 'ignored', 'resolved'];
+  if (
+    typeof r.id !== 'string' ||
+    typeof r.benchId !== 'string' ||
+    typeof r.benchName !== 'string' ||
+    typeof r.reason !== 'string' ||
+    typeof r.description !== 'string' ||
+    typeof r.reporter !== 'string' ||
+    typeof r.createdAt !== 'string' ||
+    !isValidDateString(r.createdAt) ||
+    typeof r.status !== 'string' ||
+    !validStatuses.includes(r.status)
+  ) {
+    return false;
+  }
+  if (r.status !== 'pending') {
+    if (
+      typeof r.handledAt !== 'string' ||
+      !isValidDateString(r.handledAt) ||
+      typeof r.handledBy !== 'string'
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function validateExportData(data: unknown): data is ExportData {
   if (typeof data !== 'object' || data === null) return false;
   const d = data as Record<string, unknown>;
@@ -354,7 +388,7 @@ function validateExportData(data: unknown): data is ExportData {
   if (!Array.isArray(d.contributedBenchIds) || !d.contributedBenchIds.every((id) => typeof id === 'string')) return false;
   if (!Array.isArray(d.benches) || !d.benches.every(validateBench)) return false;
   if (!Array.isArray(d.comments) || !d.comments.every(validateComment)) return false;
-  if (!Array.isArray(d.reports)) return false;
+  if (!Array.isArray(d.reports) || !d.reports.every(validateReport)) return false;
   if (typeof d.photoLikes !== 'object' || d.photoLikes === null) return false;
 
   return true;
@@ -373,6 +407,10 @@ export function importData(jsonString: string): ImportResult {
       benchesSkipped: 0,
       commentsAdded: 0,
       commentsSkipped: 0,
+      reportsAdded: 0,
+      reportsSkipped: 0,
+      photoLikesMerged: 0,
+      photoLikesSkipped: 0,
     },
   };
 
@@ -393,6 +431,7 @@ export function importData(jsonString: string): ImportResult {
   const existingCheckIns = loadCheckIns();
   const existingFavorites = loadFavorites();
   const existingComments = loadComments();
+  const existingReports = loadReports();
   const existingContributed = loadContributedBenches();
   const existingPhotoLikes = loadPhotoLikes();
 
@@ -400,6 +439,7 @@ export function importData(jsonString: string): ImportResult {
   const existingCheckInIds = new Set(existingCheckIns.map((c) => c.id));
   const existingFavoriteSet = new Set(existingFavorites);
   const existingCommentIds = new Set(existingComments.map((c) => c.id));
+  const existingReportIds = new Set(existingReports.map((r) => r.id));
   const existingContributedSet = new Set(existingContributed);
 
   const newBenches: Bench[] = [];
@@ -458,6 +498,20 @@ export function importData(jsonString: string): ImportResult {
     saveComments([...existingComments, ...newComments]);
   }
 
+  const newReports: Report[] = [];
+  for (const report of data.reports) {
+    if (!existingReportIds.has(report.id) && existingBenchIds.has(report.benchId)) {
+      newReports.push(report);
+      existingReportIds.add(report.id);
+      result.stats.reportsAdded++;
+    } else {
+      result.stats.reportsSkipped++;
+    }
+  }
+  if (newReports.length > 0) {
+    saveReports([...existingReports, ...newReports]);
+  }
+
   let hasNewContributed = false;
   for (const benchId of data.contributedBenchIds) {
     if (!existingContributedSet.has(benchId) && existingBenchIds.has(benchId)) {
@@ -470,20 +524,32 @@ export function importData(jsonString: string): ImportResult {
     saveContributedBenches(existingContributed);
   }
 
+  const currentUser = loadUser();
+  if (!currentUser && data.user) {
+    saveUser(data.user);
+  }
+
   const mergedPhotoLikes = { ...existingPhotoLikes };
   for (const [key, count] of Object.entries(data.photoLikes)) {
     if (!mergedPhotoLikes[key] || count > mergedPhotoLikes[key]) {
       mergedPhotoLikes[key] = count;
+      result.stats.photoLikesMerged++;
+    } else {
+      result.stats.photoLikesSkipped++;
     }
   }
-  savePhotoLikes(mergedPhotoLikes);
+  if (result.stats.photoLikesMerged > 0) {
+    savePhotoLikes(mergedPhotoLikes);
+  }
 
   result.success = true;
   const totalAdded =
     result.stats.benchesAdded +
     result.stats.checkInsAdded +
     result.stats.favoritesAdded +
-    result.stats.commentsAdded;
+    result.stats.commentsAdded +
+    result.stats.reportsAdded +
+    result.stats.photoLikesMerged;
 
   if (totalAdded === 0) {
     result.message = '导入完成，没有新增数据（所有数据已存在）';

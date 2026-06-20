@@ -25,6 +25,7 @@ import { useUserStore } from '../store/useUserStore';
 import { useBenchStore } from '../store/useBenchStore';
 import { getScoreColor, getBenchTypeLabel } from '../utils/score';
 import { NicknameModal } from '../components/User/NicknameModal';
+import type { ImportResult } from '../utils/storage';
 
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -51,19 +52,7 @@ export const ProfilePage: React.FC = () => {
   const [nicknameError, setNicknameError] = useState('');
   const [importResult, setImportResult] = useState<{
     show: boolean;
-    success: boolean;
-    message: string;
-    stats?: {
-      checkInsAdded: number;
-      checkInsSkipped: number;
-      favoritesAdded: number;
-      favoritesSkipped: number;
-      benchesAdded: number;
-      benchesSkipped: number;
-      commentsAdded: number;
-      commentsSkipped: number;
-    };
-  }>({ show: false, success: false, message: '' });
+  } & Partial<ImportResult>>({ show: false });
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -156,7 +145,7 @@ export const ProfilePage: React.FC = () => {
   };
 
   const closeImportResult = () => {
-    setImportResult({ show: false, success: false, message: '' });
+    setImportResult({ show: false });
   };
 
   if (!user) {
@@ -547,6 +536,30 @@ export const ProfilePage: React.FC = () => {
                     <span className="text-gray-500">跳过评论</span>
                     <span className="font-medium text-gray-400">
                       {importResult.stats.commentsSkipped}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">新增举报</span>
+                    <span className="font-medium text-gray-800">
+                      {importResult.stats.reportsAdded}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">跳过举报</span>
+                    <span className="font-medium text-gray-400">
+                      {importResult.stats.reportsSkipped}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">合并点赞</span>
+                    <span className="font-medium text-gray-800">
+                      {importResult.stats.photoLikesMerged}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">保持点赞</span>
+                    <span className="font-medium text-gray-400">
+                      {importResult.stats.photoLikesSkipped}
                     </span>
                   </div>
                 </div>
