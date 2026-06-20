@@ -29,18 +29,23 @@ interface BenchTypeInfo {
   comfortTendency: {
     label: string;
     range: string;
+    min: number;
+    max: number;
+    typical: number;
     color: string;
     description: string;
   };
   maintenance: {
     label: string;
     range: string;
+    value: number;
     color: string;
     description: string;
   };
   durability: {
     label: string;
     range: string;
+    value: number;
     color: string;
     description: string;
   };
@@ -61,18 +66,23 @@ const benchTypesData: BenchTypeInfo[] = [
     comfortTendency: {
       label: '舒适度评分',
       range: '2.0 - 3.5',
+      min: 2.0,
+      max: 3.5,
+      typical: 2.7,
       color: 'text-amber-600 dark:text-amber-500',
       description: '坐感偏硬，缺少缓冲支撑。短时间歇脚尚可，长时间休憩易感不适。体型宽大的石凳可容纳多人，适合与朋友闲聊。',
     },
     maintenance: {
       label: '养护难度',
       range: '低',
+      value: 1.5,
       color: 'text-emerald-600 dark:text-emerald-500',
       description: '耐候性极强，风吹日晒雨淋皆不惧。几乎无需日常维护，仅需定期清理灰尘和落叶。使用寿命可达数十年。',
     },
     durability: {
       label: '耐用程度',
       range: '★★★★★',
+      value: 5.0,
       color: 'text-emerald-600 dark:text-emerald-500',
       description: '坚固耐用，抗腐蚀、抗老化。不怕日晒雨淋，不易损坏或被盗。唯一的天敌是人为破坏或重物撞击。',
     },
@@ -95,18 +105,23 @@ const benchTypesData: BenchTypeInfo[] = [
     comfortTendency: {
       label: '舒适度评分',
       range: '3.5 - 4.8',
+      min: 3.5,
+      max: 4.8,
+      typical: 4.2,
       color: 'text-emerald-600 dark:text-emerald-500',
       description: '公认的最佳坐感！木质材料温度适中，冬不冰夏不烫。带靠背设计的木椅更能提供腰背支撑，久坐不累。',
     },
     maintenance: {
       label: '养护难度',
       range: '中',
+      value: 3.2,
       color: 'text-amber-600 dark:text-amber-500',
       description: '需要定期刷漆/防腐处理以延长寿命。注意防水防潮，长期积水会导致腐烂霉变。好的松木、柚木自然耐腐性较好。',
     },
     durability: {
       label: '耐用程度',
       range: '★★★☆☆',
+      value: 3.0,
       color: 'text-amber-600 dark:text-amber-500',
       description: '正常维护下可用10-20年。木材易受虫蛀、潮湿影响而老化。定期刷油保养可显著延长使用寿命。',
     },
@@ -129,18 +144,23 @@ const benchTypesData: BenchTypeInfo[] = [
     comfortTendency: {
       label: '舒适度评分',
       range: '1.5 - 4.5',
+      min: 1.5,
+      max: 4.5,
+      typical: 3.0,
       color: 'text-sky-600 dark:text-sky-500',
       description: '差异悬殊！设计精良的金属+软垫组合舒适度堪比木椅；而裸露的铁皮椅则冬凉夏烫。塑料椅轻便但透气性差。',
     },
     maintenance: {
       label: '养护难度',
       range: '视材质',
+      value: 3.5,
       color: 'text-sky-600 dark:text-sky-500',
       description: '金属需防锈、塑料怕暴晒老化、藤编怕潮湿发霉、混凝土免维护但易开裂。新型复合材料通常保养最省心。',
     },
     durability: {
       label: '耐用程度',
       range: '★★★☆☆',
+      value: 3.3,
       color: 'text-sky-600 dark:text-sky-500',
       description: '不锈钢和混凝土最耐用，可达数十年。普通塑料椅3-5年会变脆。藤编和布艺需要精心呵护。',
     },
@@ -154,10 +174,31 @@ const benchTypesData: BenchTypeInfo[] = [
   },
 ];
 
-const ScoreBar: React.FC<{ value: number; color: string }> = ({ value, color }) => (
-  <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+const RangeScoreBar: React.FC<{
+  min: number;
+  max: number;
+  typical: number;
+  gradient: string;
+}> = ({ min, max, typical, gradient }) => (
+  <div className="relative h-3 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
     <div
-      className={`h-full rounded-full transition-all duration-500 ${color}`}
+      className={`absolute h-full bg-gradient-to-r ${gradient} opacity-60`}
+      style={{
+        left: `${(min / 5) * 100}%`,
+        width: `${((max - min) / 5) * 100}%`,
+      }}
+    />
+    <div
+      className={`absolute h-full w-1 bg-gradient-to-r ${gradient} rounded-full shadow-md`}
+      style={{ left: `calc(${(typical / 5) * 100}% - 2px)` }}
+    />
+  </div>
+);
+
+const SingleScoreBar: React.FC<{ value: number; gradient: string }> = ({ value, gradient }) => (
+  <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+    <div
+      className={`h-full rounded-full transition-all duration-500 bg-gradient-to-r ${gradient}`}
       style={{ width: `${(value / 5) * 100}%` }}
     />
   </div>
@@ -245,7 +286,7 @@ export const BenchEncyclopediaPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -258,12 +299,18 @@ export const BenchEncyclopediaPage: React.FC = () => {
                         {info.comfortTendency.range}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <ScoreBar value={3.2} color="bg-amber-500" />
-                      <ScoreBar value={4.5} color="bg-emerald-500" />
-                      <ScoreBar value={3.8} color="bg-sky-500" />
+                    <RangeScoreBar
+                      min={info.comfortTendency.min}
+                      max={info.comfortTendency.max}
+                      typical={info.comfortTendency.typical}
+                      gradient={info.gradient}
+                    />
+                    <div className="flex justify-between text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+                      <span>低</span>
+                      <span>典型值 {info.comfortTendency.typical}</span>
+                      <span>高</span>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mt-2">
                       {info.comfortTendency.description}
                     </p>
                   </div>
@@ -280,7 +327,8 @@ export const BenchEncyclopediaPage: React.FC = () => {
                         {info.maintenance.range}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <SingleScoreBar value={info.maintenance.value} gradient={info.gradient} />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mt-2">
                       {info.maintenance.description}
                     </p>
                   </div>
@@ -297,7 +345,8 @@ export const BenchEncyclopediaPage: React.FC = () => {
                         {info.durability.range}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <SingleScoreBar value={info.durability.value} gradient={info.gradient} />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mt-2">
                       {info.durability.description}
                     </p>
                   </div>
